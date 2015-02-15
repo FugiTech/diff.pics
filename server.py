@@ -11,34 +11,30 @@ from boto.dynamodb2.exceptions import ItemNotFound
 from boto.dynamodb2.table import Table
 from boto.s3.key import Key
 
-from bottle import (TEMPLATE_PATH, Bottle, redirect, request, response, run,
-                    static_file, view)
+from bottle import (TEMPLATE_PATH, error, get, post, redirect, request,
+                    response, run, static_file, view)
 
-# Initialize the bottle app
 TEMPLATE_PATH.append(".")
-app = Bottle()
-
-# Initialize the AWS connections
 comparisons = Table("diff.pics-comparisons")
 images = Table("diff.pics-images")
 image_data = boto.connect_s3().get_bucket("diff.pics")
 
-@app.get("/static/<filename:path>")
+@get("/static/<filename:path>")
 def static(filename):
     return static_file(filename, root="{}/static".format(os.getcwd()))
 
-@app.get("/")
+@get("/")
 def index():
     return static_file("index.html", root=os.getcwd())
 
-@app.get("/check/<hashes>")
+@get("/check/<hashes>")
 def check(hashes):
     hashes = set(hashes.upper().split(","))
     results = images.batch_get(keys=[{"sha1": h} for h in hashes], consistent=True)
     exists = set([r["sha1"] for r in results])
     return json.dumps({h:h in exists for h in hashes})
 
-@app.post("/upload")
+@post("/upload")
 def upload():
     image = request.files.get("image")
     name, ext = os.path.splitext(image.raw_filename)
@@ -62,7 +58,7 @@ def upload():
 
     return "{} = {}".format(image.raw_filename, sha)
 
-@app.post("/submit")
+@post("/submit")
 def submit():
     title = request.params.get("title")
     data = json.loads(request.params.get("comparisons"))
@@ -84,7 +80,7 @@ def submit():
     comparisons.put_item(data={"key": key, "title": title, "comparisons": data})
     return key
 
-@app.get("/<key>")
+@get("/<key>")
 @view("comparison")
 def comparison(key):
     try:
@@ -99,11 +95,11 @@ def comparison(key):
 
     return {"title": c["title"] or "Untitled", "comparisons": json.dumps(data)}
 
-@app.error(404)
+@error(404)
 def error404(error):
     response.status = 303
     response.set_header("Location", "/")
     return ""
 
 if __name__ == "__main__":
-    run(app=app, host="localhost", port=8080, debug=True)
+    run(host="localhost", port=8080, debug=True)
