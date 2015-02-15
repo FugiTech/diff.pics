@@ -1,4 +1,3 @@
-LOADING = [];
 CDN = "http://diff.pics.s3-website-us-east-1.amazonaws.com/";
 
 RSVP.on("error", function (e) {
@@ -7,40 +6,49 @@ RSVP.on("error", function (e) {
 
 $(function () {
   COMPARISONS = _.filter(COMPARISONS, "length", 2);
-  _.each(COMPARISONS, function (images) {
-    _.each(images, function (image) {
-      var d = RSVP.defer();
-      var img = $("<img>");
-      img.on("load", function () { d.resolve(); });
-      img.on("error", function () { d.reject(); });
-      img.attr("src", CDN + image.hash);
-      $("#preload").append(img);
-      LOADING.push(d.promise);
+  if (COMPARISONS.length > 1) {
+    _.each(COMPARISONS, function (comparison) {
+      $("#selector").append($("<img>"));
     });
+  }
+
+  loadComparison(0).then(function () {
+    $("#preload").css("opacity", 0);
+    setComparison(0);
+
+    for (var i = 1; i < COMPARISONS.length; i++) {
+      loadComparison(i);
+    }
   });
-  RSVP.all(LOADING).finally(loaded);
 });
 
 $(document).on("click", "#selector img", function () {
-  setComparison(COMPARISONS[$(this).index()]);
+  setComparison($(this).index());
 });
 
-function loaded() {
-  console.log("LOADED!");
-  $("#preload").remove();
-  setComparison(COMPARISONS[0]);
-
-  if (COMPARISONS.length > 1) {
-    _.each(COMPARISONS, function (comparison) {
-      $("#selector").append($("<img>").attr("src", CDN + comparison[0].hash));
-    });
-  }
+function loadComparison(index) {
+  var loading = [];
+  _.each(COMPARISONS[index], function (image) {
+    var d = RSVP.defer();
+    var img = $("<img>");
+    img.on("load", function () { d.resolve(); });
+    img.on("error", function () { d.reject(); });
+    img.attr("src", CDN + image.hash);
+    $("#preload").append(img);
+    loading.push(d.promise);
+  });
+  return RSVP.all(loading).then(function () {
+    var selectors = $("#selector img");
+    if (selectors.length) {
+      selectors[index].src = CDN + COMPARISONS[index][0].hash;
+    }
+  });
 }
 
-function setComparison(c) {
-  $("#comparison img").attr("src", CDN + c[0].hash);
-  $("#comparison").css("background-image", "url(" + CDN + c[1].hash + ")");
+function setComparison(index) {
+  $("#comparison img").attr("src", CDN + COMPARISONS[index][0].hash);
+  $("#comparison").css("background-image", "url(" + CDN + COMPARISONS[index][1].hash + ")");
 
-  $("#main").text(c[0].name);
-  $("#hover").text(c[1].name);
+  $("#main").text(COMPARISONS[index][0].name);
+  $("#hover").text(COMPARISONS[index][1].name);
 }
