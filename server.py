@@ -11,10 +11,15 @@ from boto.dynamodb2.exceptions import ItemNotFound
 from boto.dynamodb2.table import Table
 from boto.s3.key import Key
 
-from bottle import (TEMPLATE_PATH, app, error, get, post, redirect, request,
+from bottle import app as app_factory
+from bottle import (TEMPLATE_PATH, error, get, post, redirect, request,
                     response, run, static_file, view)
 
+# Initialize app
+app = app_factory()
 TEMPLATE_PATH.append(".")
+
+# Initialize AWS
 comparisons = Table("diff.pics-comparisons")
 images = Table("diff.pics-images")
 image_data = boto.connect_s3().get_bucket("diff.pics")
