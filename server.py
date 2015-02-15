@@ -11,7 +11,7 @@ from boto.dynamodb2.exceptions import ItemNotFound
 from boto.dynamodb2.table import Table
 from boto.s3.key import Key
 
-from bottle import (TEMPLATE_PATH, error, get, post, redirect, request,
+from bottle import (TEMPLATE_PATH, app, error, get, post, redirect, request,
                     response, run, static_file, view)
 
 TEMPLATE_PATH.append(".")
@@ -102,4 +102,4 @@ def error404(error):
     return ""
 
 if __name__ == "__main__":
-    run(host="localhost", port=8080, debug=True)
+    run(host="0.0.0.0", port=8080, debug=True)
