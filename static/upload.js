@@ -86,17 +86,28 @@ RUSHA.onmessage = function (e) {
 };
 
 function checkSha(hash) {
-  return $.get("/check/"+hash).then(function (r) {
+  return RSVP.resolve($.get("/check/"+hash)).then(function (r) {
     _.merge(SHAS, JSON.parse(r));
   });
 }
 
 // Uploader
 $(document).on("click", "#submit", function () {
+  $("#upload > progress").show();
   $("#upload").show();
   uploadAllImages().then(function () {
     return submit();
+  }).catch(function (e) {
+    $("#upload > h1").text("ERROR: " + e);
+  }).then(function () {
+    $("#upload > progress").hide();
+    $("#hide").show();
   });
+});
+
+$(document).on("click", "#hide", function () {
+  $("#hide").hide();
+  $("#upload").hide();
 });
 
 function remaining() {
@@ -112,10 +123,13 @@ function uploadAllImages() {
   var hashes = _.pluck(remaining(), "sha1");
   if (!hashes.length) return RSVP.resolve();
 
-  return checkSha(hashes.join(",")).finally(function () {
+  return checkSha(hashes.join(",")).catch(function () {
+    return true; // Eat the error
+  }).then(function () {
     var r = remaining();
     if (!r.length) return RSVP.resolve();
-    return upload(r[0]).finally(function () {
+
+    return upload(r[0]).then(function () {
       return uploadAllImages();
     });
   });
@@ -141,11 +155,13 @@ function upload(file) {
       }, false);
       return xhr;
     }
-  })).catch(function () {
-    return true; // If it fails we'll try again soon enough...
-  }).then(function () {
+  })).then(function (r) {
     $("#upload > img").attr("src", "");
     $("#upload > progress").attr("value", null);
+
+    if (r.split(" ")[1] != "=") {
+      throw r;
+    }
   });
 }
 
@@ -162,7 +178,7 @@ function submit() {
     }
   })).then(function (r) {
     if (_.contains(r, " ")) {
-      $("#upload > h1").text("ERROR: " + r);
+      throw r;
     } else {
       window.location = "/" + r;
     }
