@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Diff.Pics</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,700">
+    <link rel="stylesheet" href="static/upload.css">
+  </head>
+  <body>
+    <br>
+    <input id="title" type="text" placeholder="Comparison Title">
+    <div id="comparisons"></div>
+    <div id="add">Add Comparison</div>
+    <div id="submit">Submit Comparisons</div>
+
+    <div id="upload">
+      <h1></h1>
+      <img src="">
+      <progress></progress>
+    </div>
+
+    <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/ICanHaz.js/0.10.3/ICanHaz.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.2.0/lodash.min.js"></script>
+    <script src="static/rusha.js"></script>
+    <script src="static/rsvp.js"></script>
+    <script src="static/upload.js"></script>
+  </body>
+</html>
+
+<script id="comparison" type="text/html">
+  <div class="comparison">
+    <div class="number">{{number}}</div>
+    {{>image}}
+    {{>image}}
+    <div class="remove"><br>D<br>E<br>L<br>E<br>T<br>E</div>
+  </div>
+</script>
+
+<script id="image" type="text/html">
+  <div class="image">
+    <img src="">
+    <strong>Drop Image Here</strong>
+    <br>
+    <em>or</em>
+    <br>
+    <div class="button">
+      <button type="button">Browse file&hellip;</button>
+      <input type="file" accept="image/*">
+    </div>
+  </div>
+</script>

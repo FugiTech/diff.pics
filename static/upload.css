@@ -1,0 +1,207 @@
+html, body {
+    margin: 0;
+    padding: 0px;
+    color: #FFF;
+    background: #000;
+    font-family: "Open Sans", sans-serif;
+    text-align: center;
+}
+
+img[src=""] {
+    display: none;
+}
+
+#title {
+    height: 50px;
+    width: 600px;
+    font-size: 40px;
+    text-align: center;
+    color: #FFF;
+    background: #000;
+    margin: 1px;
+    outline: none;
+    border: 2px solid #444;
+    border-radius: 25px;
+}
+
+#title:focus {
+    margin: 0;
+    border: 3px solid #666;
+}
+
+.comparison {
+    margin: 20px auto;
+    height: 220px;
+    width: 900px;
+    border: 2px solid #444;
+    border-radius: 100px;
+    text-align: left;
+}
+
+.number {
+    vertical-align: top;
+    display: inline-block;
+    margin: 10px;
+    height: 200px;
+    width: 50px;
+    line-height: 200px;
+    font-size: 120px;
+    color: #666;
+}
+
+.image {
+    position: relative;
+    vertical-align: top;
+    display: inline-block;
+    box-sizing: border-box;
+    margin: 10px;
+    width: 356px;
+    height: 200px;
+    border: 5px dashed #444;
+    text-align: center;
+}
+
+.image.hover {
+    border: 5px dashed #666;
+}
+
+.image > img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    margin: -5px;
+    width: 356px;
+    height: 200px;
+    z-index: 2;
+}
+
+.image > strong {
+    display: inline-block;
+    margin-top: 60px;
+    color: #CCC;
+}
+
+.image > em {
+    color: #999;
+}
+
+.button {
+    display: inline-block;
+    position: relative;
+    width: 140px;
+    height: 30px;
+    border: 3px solid #444;
+}
+
+.button:hover {
+    border: 3px solid #666;
+}
+
+.button > button {
+    position: relative;
+    width: 140px;
+    height: 30px;
+    color: #CCC;
+    background: #000;
+    border: none;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+
+.button > input {
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    top: 0;
+    opacity: 0;
+    z-index: 1;
+    overflow: hidden;
+    width: 140px;
+    max-width: 140px;
+    height: 30px;
+}
+
+.remove {
+    vertical-align: top;
+    display: inline-block;
+    margin-top: 10px;
+    height: 200px;
+    width: 40px;
+    color: #444;
+    text-align: center;
+    line-height: 24px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.remove:hover {
+    color: #666;
+    cursor: pointer;
+}
+
+#add {
+    margin: 20px auto;
+    height: 30px;
+    width: 900px;
+    color: #CCC;
+    background: #444;
+    border-radius: 15px;
+    line-height: 30px;
+    font-size: 24px;
+}
+
+#add:hover {
+    background: #666;
+    cursor: pointer;
+}
+
+#submit {
+    margin: 0 auto;
+    height: 50px;
+    width: 600px;
+    line-height: 46px;
+    font-size: 40px;
+    font-weight: bold;
+    text-align: center;
+    color: #000;
+    background: #999;
+    border-radius: 25px;
+}
+
+#submit:hover {
+    background: #CCC;
+    cursor: pointer;
+}
+
+#upload {
+    display: none;
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    right: 0;
+    margin: 80px auto;
+    width: 900px;
+    background: #111;
+    border-radius: 25px;
+}
+
+#upload > h1 {
+    width: 860px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#upload > img {
+    height: 500px;
+    width: 889px;
+}
+
+#upload > progress {
+    width: 889px;
+    margin-bottom: 20px;
+}
