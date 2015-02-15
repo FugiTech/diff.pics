@@ -112,10 +112,10 @@ function uploadAllImages() {
   var hashes = _.pluck(remaining(), "sha1");
   if (!hashes.length) return RSVP.resolve();
 
-  return checkSha(hashes.join(",")).then(function () {
+  return checkSha(hashes.join(",")).finally(function () {
     var r = remaining();
     if (!r.length) return RSVP.resolve();
-    return upload(r[0]).then(function () {
+    return upload(r[0]).finally(function () {
       return uploadAllImages();
     });
   });
