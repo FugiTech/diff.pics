@@ -1,4 +1,4 @@
-CDN = "http://diff.pics.s3-website-us-east-1.amazonaws.com/";
+CDN = "http://d2oi7olbgatl9f.cloudfront.net/";
 
 RSVP.on("error", function (e) {
   console.error(e);
