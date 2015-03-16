@@ -72,7 +72,8 @@ def upload():
     else:
         return "{} = {}{}".format(r.filename, r.sha1, r.ext or "")
 
-    k = Key(image_data, sha+ext, content_type=mimes[ext])
+    k = Key(image_data, sha+ext)
+    k.content_type = mimes[ext]
     k.set_contents_from_string(data)
 
     images.put_item(data={"sha1": sha, "filename": image.raw_filename, "ext": ext})
