@@ -54,14 +54,14 @@ def upload():
     except ItemNotFound:
         pass
     else:
-        return "{} = {}".format(r.raw_filename, sha)
+        return "{} = {}{}".format(r.filename, r.sha1, r.ext or "")
 
     k = Key(image_data, sha)
     k.set_contents_from_string(data)
 
-    images.put_item(data={"sha1": sha, "filename": image.raw_filename})
+    images.put_item(data={"sha1": sha, "filename": image.raw_filename, "ext": ext})
 
-    return "{} = {}".format(image.raw_filename, sha)
+    return "{} = {}{}".format(image.raw_filename, sha, ext)
 
 @post("/submit")
 def submit():
@@ -82,7 +82,7 @@ def submit():
             break
         key, key_length = None, key_length + 1
 
-    comparisons.put_item(data={"key": key, "title": title, "comparisons": data})
+    comparisons.put_item(data={"key": key, "title": title, "comparisons": data, "views": 0})
     return key
 
 @get("/<key>")
@@ -93,9 +93,12 @@ def comparison(key):
     except ItemNotFound:
         redirect("/")
 
+    c.add_attribute("views", 1)
+    c.save()
+
     hashes = set([item for sublist in c["comparisons"] for item in sublist])
     results = images.batch_get(keys=[{"sha1": h} for h in hashes], consistent=True)
-    imgs = {i["sha1"]:{"hash": i["sha1"], "name": i["filename"]} for i in results}
+    imgs = {i["sha1"]:{"hash": i["sha1"]+i.get("ext", ""), "name": i["filename"]} for i in results}
     data = [[imgs[h] for h in l] for l in c["comparisons"]]
 
     return {"title": c["title"] or "Untitled", "comparisons": json.dumps(data)}
