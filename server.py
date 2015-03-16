@@ -66,7 +66,7 @@ def upload():
     else:
         return "{} = {}{}".format(r.filename, r.sha1, r.ext or "")
 
-    k = Key(image_data, sha)
+    k = Key(image_data, sha+ext)
     k.set_contents_from_string(data)
 
     images.put_item(data={"sha1": sha, "filename": image.raw_filename, "ext": ext})
