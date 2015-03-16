@@ -24,6 +24,16 @@ comparisons = Table("diff.pics-comparisons")
 images = Table("diff.pics-images")
 image_data = boto.connect_s3().get_bucket("diff.pics")
 
+# Utility functions
+def increment_item(item, key, value):
+    item.table._update_item(item.get_keys(), {
+        key: {
+            "Action": "ADD",
+            "Value": {"N": str(value)}
+        }
+    })
+
+# Web app
 @get("/static/<filename:path>")
 def static(filename):
     return static_file(filename, root="{}/static".format(os.getcwd()))
@@ -93,8 +103,7 @@ def comparison(key):
     except ItemNotFound:
         redirect("/")
 
-    c.add_attribute("views", 1)
-    c.save()
+    increment_item(c, "views", 1)
 
     hashes = set([item for sublist in c["comparisons"] for item in sublist])
     results = images.batch_get(keys=[{"sha1": h} for h in hashes], consistent=True)
