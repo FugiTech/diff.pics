@@ -51,9 +51,15 @@ def check(hashes):
 
 @post("/upload")
 def upload():
+    mimes = {
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg"
+    }
+
     image = request.files.get("image")
     name, ext = os.path.splitext(image.raw_filename)
-    if ext not in ('.png','.jpg','.jpeg'):
+    if ext not in mimes:
         return 'File extension not allowed.'
 
     data = image.file.read()
@@ -66,7 +72,7 @@ def upload():
     else:
         return "{} = {}{}".format(r.filename, r.sha1, r.ext or "")
 
-    k = Key(image_data, sha+ext)
+    k = Key(image_data, sha+ext, content_type=mimes[ext])
     k.set_contents_from_string(data)
 
     images.put_item(data={"sha1": sha, "filename": image.raw_filename, "ext": ext})
