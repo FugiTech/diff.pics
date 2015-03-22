@@ -56,15 +56,18 @@ $(document).on("change", ".image > .button > input", function () {
 // Add & Remove comparisons
 $(document).on("click", "#add", function () {
   IMAGES.push([]);
-  $("#comparisons").append(ich.comparison({
-    number: $("#comparisons > div").length + 1
-  }));
+
+  var num = $("#comparisons > div").length + 1;
+  var row = ich.comparison({number: num});
+  if (num >= 10) row.find(".number").addClass("large-number");
+  $("#comparisons").append(row);
 });
 $(document).on("click", ".remove", function () {
   IMAGES.splice($(this).parent().index(), 1);
+
   $(this).parent().remove();
   $(".comparison").each(function (index) {
-    $(this).find(".number").text(index + 1);
+    $(this).find(".number").text(index + 1).toggleClass("large-number", index >= 10);
   });
 });
 

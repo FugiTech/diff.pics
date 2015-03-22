@@ -49,6 +49,11 @@ img[src=""] {
     color: #666;
 }
 
+.large-number {
+    font-weight: bold;
+    font-size: 60px;
+}
+
 .image {
     position: relative;
     vertical-align: top;
