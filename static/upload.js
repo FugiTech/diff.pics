@@ -2,6 +2,7 @@ var COLUMNS = ["",""];
 var IMAGES = [];
 var SHAS = {};
 var RUSHA = new Worker("static/rusha.js");
+var COMPARE = MassImageCompare("static/mass-image-compare.js");
 var JOBS = {}, LAST_JOB_ID = 0;
 
 RSVP.on("error", function (e) {
@@ -286,6 +287,7 @@ $(document).on("drop", "#magic", function (e) {
 });
 
 function magic(files) {
+  var start = Date.now();
   $("#wizard").show();
 
   var comparisons = {}
@@ -305,12 +307,7 @@ function magic(files) {
     $("#wizard > progress").attr("value", completed);
   };
 
-  var comparer = MassImageCompare("static/mass-image-compare.js");
-  var start = Date.now();
-  comparer.compare(images, false, onprogress).then(function (data) {
-    var end = Date.now();
-    console.log(data);
-    console.log(end - start)
+  COMPARE.compare(images, false, onprogress).then(function (data) {
     $("#wizard").hide();
 
     if (_.isEmpty(_.last(IMAGES))) {
@@ -339,8 +336,8 @@ function magic(files) {
     });
 
     var awords = [], bwords = [];
-    _.each(_.sortByOrder(together, [0], [false]), function (i) {
-      console.log(i[1], i[2], i[0]);
+    _.each(_.sortByOrder(together, [0], [false]), function (i, n) {
+      console.info("Comparison #" + (n+1) + " is " + i[0] + "% different");
       createComparison();
       var containers = $("#comparisons > div:last-child .image");
       var a = files[i[1]], b = files[i[2]];
@@ -354,7 +351,6 @@ function magic(files) {
     // Try to set sane titles if we can
     var column_title = function (v, i) {
       v = _.chain(v).unzip().map(_.uniq).filter("length", 1).flatten().value().join(" ");
-      console.log(i, v);
       i = $(i);
       if (v && !i.val()) i.val(v).trigger("input");
       return v;
@@ -363,5 +359,7 @@ function magic(files) {
       _.words(column_title(awords, "#rename > input:nth-child(2)")),
       _.words(column_title(bwords, "#rename > input:nth-child(3)"))
     ], "#title");
+
+    console.debug("Time spent during Mass Compare: "+(Date.now() - start)+"ms");
   });
 };
