@@ -7,6 +7,16 @@ RSVP.on("error", function (e) {
   console.error(e);
 });
 
+function stringInject(message, injector) {
+  return _.chain(injector)
+          .repeat(message.length)
+          .chunk(injector.length)
+          .zip(message)
+          .flatten(true)
+          .value()
+          .join("");
+}
+
 // DEBUG
 function debugImages() {
   return JSON.stringify(_.map(IMAGES, function (comparison) {
@@ -16,8 +26,16 @@ function debugImages() {
 
 // Set up UI
 $(function () {
+  $("#add").html(ich.add_comparison());
+  $("#submit").html(ich.submit_comparison());
+  $("#hide").html(ich.accept());
+  $("#footer").html(ich.footer({
+    "github": '<a href="https://github.com/Fugiman/diff.pics/issues">Github</a>',
+    "twitter": '<a href="https://twitter.com/fugiman">Twitter</a>'
+  }));
+
   IMAGES.push([]);
-  $("#comparisons").append(ich.comparison({number: 1}));
+  createComparison(1);
 });
 
 // Drage & Drop UI
@@ -54,13 +72,21 @@ $(document).on("change", ".image > .button > input", function () {
 });
 
 // Add & Remove comparisons
-$(document).on("click", "#add", function () {
-  IMAGES.push([]);
-
-  var num = $("#comparisons > div").length + 1;
-  var row = ich.comparison({number: num});
+function createComparison(num) {
+  var row = ich.comparison({
+    number: num,
+    remove: stringInject(ich.remove_comparison().text(), "<br>"),
+    drop: ich.upload_drop().html(),
+    or: ich.upload_or().html(),
+    browse: ich.upload_browse().html()
+  });
   if (num >= 10) row.find(".number").addClass("large-number");
   $("#comparisons").append(row);
+};
+
+$(document).on("click", "#add", function () {
+  IMAGES.push([]);
+  createComparison($("#comparisons > div").length + 1);
 });
 $(document).on("click", ".remove", function () {
   IMAGES.splice($(this).parent().index(), 1);
@@ -101,7 +127,7 @@ $(document).on("click", "#submit", function () {
   uploadAllImages().then(function () {
     return submit();
   }).catch(function (e) {
-    $("#upload > h1").text("ERROR: " + e);
+    $("#upload > h1").html(ich.error({error_message: e}));
   }).then(function () {
     $("#upload > progress").hide();
     $("#hide").show();
@@ -122,7 +148,7 @@ function remaining() {
 }
 
 function uploadAllImages() {
-  $("#upload > h1").text("Finding remaining images to upload");
+  $("#upload > h1").html(ich.uploading_search());
   var hashes = _.pluck(remaining(), "sha1");
   if (!hashes.length) return RSVP.resolve();
 
@@ -139,7 +165,7 @@ function uploadAllImages() {
 }
 
 function upload(file) {
-  $("#upload > h1").text("Uploading " + file.name);
+  $("#upload > h1").html(ich.uploading_image({filename: file.name}));
   $("#upload > img").attr("src", window.URL.createObjectURL(file));
   var data = new FormData();
   data.append("image", file);
@@ -169,7 +195,7 @@ function upload(file) {
 }
 
 function submit() {
-  $("#upload > h1").text("Submitting comparison");
+  $("#upload > h1").html(ich.uploading_submit());
   return RSVP.resolve($.ajax({
     type: "POST",
     url: "/submit",

@@ -23,18 +23,15 @@
       <img src="">
     </div>
 
-    <div id="preload">
-      <h1>Loading...</h1>
-    </div>
+    <div id="preload"><h1></h1></div>
 
-    <div id="footer">
-      Submit feedback on <a href="https://github.com/Fugiman/diff.pics/issues">Github</a> or <a href="https://twitter.com/fugiman">Twitter</a>
-    </div>
+    <div id="footer"></div>
 
     <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/ICanHaz.js/0.10.3/ICanHaz.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.2.0/lodash.min.js"></script>
     <script src="static/rsvp.js"></script>
+    <script src="static/translations.js"></script>
     <script src="static/view.js"></script>
 
     <script>

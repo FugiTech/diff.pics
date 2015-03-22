@@ -5,6 +5,12 @@ RSVP.on("error", function (e) {
 });
 
 $(function () {
+  $("#preload").find("h1").html(ich.loading());
+  $("#footer").html(ich.footer({
+    "github": '<a href="https://github.com/Fugiman/diff.pics/issues">Github</a>',
+    "twitter": '<a href="https://twitter.com/fugiman">Twitter</a>'
+  }));
+
   COMPARISONS = _.filter(COMPARISONS, "length", 2);
   if (COMPARISONS.length > 1) {
     _.each(COMPARISONS, function (comparison) {
