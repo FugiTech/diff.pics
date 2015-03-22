@@ -26,6 +26,7 @@ function debugImages() {
 
 // Set up UI
 $(function () {
+  $("#title").attr("placeholder", ich.comparison_title().text());
   $("#add").html(ich.add_comparison());
   $("#submit").html(ich.submit_comparison());
   $("#hide").html(ich.accept());

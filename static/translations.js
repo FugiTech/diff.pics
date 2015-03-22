@@ -18,13 +18,23 @@ var urlParams;
   while (!languages[userLanguage] && _.contains(userLanguage, "-")) {
     userLanguage = _.initial(userLanguage.split("-")).join("-");
   }
-  userLanguage = userLanguage || "en";
+
   console.info("Loaded localized text for:", userLanguage);
-  _.each(languages[userLanguage], function (template, key) {
-    ich.addTemplate(key, '<span>'+template+'</span>');
+  if (languages[userLanguage]) {
+    _.each(languages[userLanguage], function (template, key) {
+      ich.addTemplate(key, '<span>'+template+'</span>');
+    });
+  }
+
+  // Graceful fallback to EN if some templates aren't defined in other languages
+  _.each(languages["en"], function (template, key) {
+    if (_.isUndefined(ich[key])) {
+      ich.addTemplate(key, '<span>'+template+'</span>');
+    }
   });
 })({
   "en": {
+    "comparison_title": "Comparison Title",
     "add_comparison": "Add Comparison",
     "submit_comparison": "Submit Comparisons",
     "remove_comparison": "DELETE",
@@ -43,6 +53,7 @@ var urlParams;
     "error": "ERROR: {{error_message}}",
   },
   "jp": {
+    "comparison_title": "比較タイトル",
     "add_comparison": "比較を追加",
     "submit_comparison": "比較を提出",
     "remove_comparison": "消す",
