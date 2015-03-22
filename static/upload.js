@@ -20,6 +20,7 @@ function stringInject(message, injector) {
 
 function nameAndExt(filename) {
   var a = filename.split(".");
+  if (a.length <= 1) return [a[0], "png"]; // Uh oh
   return [_.initial(a).join("."), _.last(a)];
 }
 
@@ -42,8 +43,7 @@ $(function () {
     "twitter": '<a href="https://twitter.com/fugiman">Twitter</a>'
   }));
 
-  IMAGES.push([]);
-  createComparison(1);
+  createComparison();
 });
 
 // Drage & Drop UI
@@ -70,19 +70,20 @@ $(document).on("input", "#rename > input", function () {
   var column = $(this).index() - 1;
   COLUMNS[column] = $(this).val();
   $(".image:nth-child("+(column + 2)+")").each(function (comparison) {
-    $(this).find('input[type="text"]').toggle(IMAGES[comparison][column] && !COLUMNS[column]);
+    $(this).children('input').toggle(IMAGES[comparison][column] && !COLUMNS[column]);
   });
 });
 
 // Image Uploader
 function load(container, file) {
+  file.url = file.url || window.URL.createObjectURL(file);
   file.goodName = file.name;
   var comparison = container.parent().index();
   var column = container.index() - 1;
 
   IMAGES[comparison][column] = file;
-  container.find("img").attr("src", window.URL.createObjectURL(file));
-  container.find('input[type="text"]').val(nameAndExt(file.goodName)[0]).show();
+  container.find("img").attr("src", file.url);
+  container.children('input').val(nameAndExt(file.goodName)[0]).show();
 
   sha1(file).then(function (hash) {
     file.sha1 = hash;
@@ -101,7 +102,9 @@ $(document).on("change", ".image > .button > input", function () {
 });
 
 // Add & Remove comparisons
-function createComparison(num) {
+function createComparison() {
+  IMAGES.push([]);
+  var num = $("#comparisons > div").length + 1;
   var row = ich.comparison({
     number: num,
     remove: stringInject(ich.remove_comparison().text(), "<br>"),
@@ -112,18 +115,20 @@ function createComparison(num) {
   if (num >= 10) row.find(".number").addClass("large-number");
   $("#comparisons").append(row);
 };
+function removeComparison(index) {
+  IMAGES.splice(index, 1);
 
-$(document).on("click", "#add", function () {
-  IMAGES.push([]);
-  createComparison($("#comparisons > div").length + 1);
-});
-$(document).on("click", ".remove", function () {
-  IMAGES.splice($(this).parent().index(), 1);
-
-  $(this).parent().remove();
+  $("#comparisons > div:nth-child("+(index + 1)+")").remove();
   $(".comparison").each(function (index) {
     $(this).find(".number").text(index + 1).toggleClass("large-number", index >= 10);
   });
+}
+
+$(document).on("click", "#add", function () {
+  createComparison();
+});
+$(document).on("click", ".remove", function () {
+  removeComparison($(this).parent().index());
 });
 
 // Sha1 calculation
@@ -265,3 +270,98 @@ function submit() {
     }
   });
 }
+
+// Magical Auto-comparison bullshit
+var hideMagic = _.debounce(function () { $("#magic").hide(); }, 100);
+
+$(document).on("dragover", function (e) {
+  $("#magic").toggle(e.originalEvent.dataTransfer.items.length > 1);
+  hideMagic();
+  return false;
+});
+
+$(document).on("drop", "#magic", function (e) {
+  magic(e.originalEvent.dataTransfer.files);
+  return false;
+});
+
+function magic(files) {
+  $("#wizard").show();
+
+  var comparisons = {}
+  for (var i = 0; i < files.length; i++)
+    comparisons[i] = [];
+
+  _.each(files, function (file) {
+    file.url = window.URL.createObjectURL(file);
+  });
+
+  var images = _.pluck(files, "url");
+  _.each(images, function (image) {
+    $("#wizard > div").append($("<img>").attr("src", image));
+  });
+
+  var onprogress = function (completed) {
+    $("#wizard > progress").attr("value", completed);
+  };
+
+  var comparer = MassImageCompare("static/mass-image-compare.js");
+  var start = Date.now();
+  comparer.compare(images, false, onprogress).then(function (data) {
+    var end = Date.now();
+    console.log(data);
+    console.log(end - start)
+    $("#wizard").hide();
+
+    if (_.isEmpty(_.last(IMAGES))) {
+      removeComparison(IMAGES.length - 1);
+    }
+
+    _.each(data, function (d) {
+      comparisons[d.a][d.b] = 1 * d.p;
+    });
+
+    var compare = function (_a, _b) {
+      var a = Math.min(_a, _b),
+          b = Math.max(_a, _b);
+      return comparisons[a][b];
+    }
+
+    var done = {};
+    var together = [];
+    var last_b = 0;
+    _.each(_.range(files.length), function (a) {
+      if (a in done) return;
+      var d = _.min(comparisons[a]);
+      var b = _.indexOf(comparisons[a], d);
+      done[a] = done[b] = true;
+      together.push([d, a, b]);
+    });
+
+    var awords = [], bwords = [];
+    _.each(_.sortByOrder(together, [0], [false]), function (i) {
+      console.log(i[1], i[2], i[0]);
+      createComparison();
+      var containers = $("#comparisons > div:last-child .image");
+      var a = files[i[1]], b = files[i[2]];
+      load($(containers[0]), a);
+      load($(containers[1]), b);
+
+      awords.push(_.words(nameAndExt(a.goodName)[0]));
+      bwords.push(_.words(nameAndExt(b.goodName)[0]));
+    });
+
+    // Try to set sane titles if we can
+    var column_title = function (v, i) {
+      v = _.chain(v).unzip().map(_.uniq).filter("length", 1).flatten().value().join(" ");
+      console.log(i, v);
+      i = $(i);
+      if (v && !i.val()) i.val(v).trigger("input");
+      return v;
+    };
+    column_title([
+      _.words(column_title(awords, "#rename > input:nth-child(2)")),
+      _.words(column_title(bwords, "#rename > input:nth-child(3)"))
+    ], "#title");
+  });
+};
