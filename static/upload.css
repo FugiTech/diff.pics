@@ -213,7 +213,7 @@ img[src=""] {
 }
 
 #submit {
-    margin: 0 auto;
+    margin: 0 auto 300px;
     height: 50px;
     width: 600px;
     line-height: 46px;
