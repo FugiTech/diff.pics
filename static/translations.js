@@ -36,6 +36,7 @@ var urlParams;
   "en": {
     "comparison_title": "Comparison Title",
     "add_comparison": "Add Comparison",
+    "rename_comparison": "Mass Rename",
     "submit_comparison": "Submit Comparisons",
     "remove_comparison": "DELETE",
 
@@ -51,6 +52,8 @@ var urlParams;
     "loading": "Loading...",
     "footer": "Submit feedback on {{{github}}} or {{{twitter}}}",
     "error": "ERROR: {{error_message}}",
+
+    "duplicate_file_error": "You can't upload the same file twice",
   },
   "jp": {
     "comparison_title": "比較タイトル",

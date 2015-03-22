@@ -129,6 +129,23 @@ img[src=""] {
     height: 30px;
 }
 
+.image > input {
+    position: absolute;
+    display: none;
+    z-index: 2;
+    left: 0;
+    bottom: 0;
+    width: 344px;
+    color: #CCC;
+    background: #444;
+    border: 0;
+    text-align: center;
+}
+
+.image > input:hover {
+    background: #666;
+}
+
 .remove {
     vertical-align: top;
     display: inline-block;
@@ -161,6 +178,38 @@ img[src=""] {
 #add:hover {
     background: #666;
     cursor: pointer;
+}
+
+#rename {
+    margin: 20px auto;
+    height: 40px;
+    width: 900px;
+    border: 2px solid #444;
+    border-radius: 100px;
+}
+
+#rename > h3 {
+    display: inline-block;
+    margin: 0;
+    color: #666;
+    line-height: 40px;
+}
+
+#rename > input {
+    vertical-align: top;
+    width: 356px;
+    margin: 10px;
+    padding: 0;
+    border: 0;
+    text-align: center;
+    font-size: 16px;
+    line-height: 20px;
+    color: #CCC;
+    background: #444;
+}
+
+#rename > input:hover {
+    background: #666;
 }
 
 #submit {

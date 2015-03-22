@@ -58,7 +58,8 @@ def upload():
     }
 
     image = request.files.get("image")
-    name, ext = os.path.splitext(image.raw_filename)
+    filename = request.params.get("filename")
+    name, ext = os.path.splitext(filename)
     if ext not in mimes:
         return 'File extension not allowed.'
 
@@ -76,9 +77,9 @@ def upload():
     k.content_type = mimes[ext]
     k.set_contents_from_string(data)
 
-    images.put_item(data={"sha1": sha, "filename": image.raw_filename, "ext": ext})
+    images.put_item(data={"sha1": sha, "filename": filename, "ext": ext})
 
-    return "{} = {}{}".format(image.raw_filename, sha, ext)
+    return "{} = {}{}".format(filename, sha, ext)
 
 @post("/submit")
 def submit():

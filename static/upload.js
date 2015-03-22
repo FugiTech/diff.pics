@@ -1,3 +1,4 @@
+var COLUMNS = ["",""];
 var IMAGES = [];
 var SHAS = {};
 var RUSHA = new Worker("static/rusha.js");
@@ -17,6 +18,11 @@ function stringInject(message, injector) {
           .join("");
 }
 
+function nameAndExt(filename) {
+  var a = filename.split(".");
+  return [_.initial(a).join("."), _.last(a)];
+}
+
 // DEBUG
 function debugImages() {
   return JSON.stringify(_.map(IMAGES, function (comparison) {
@@ -28,6 +34,7 @@ function debugImages() {
 $(function () {
   $("#title").attr("placeholder", ich.comparison_title().text());
   $("#add").html(ich.add_comparison());
+  $("#rename > h3").html(ich.rename_comparison());
   $("#submit").html(ich.submit_comparison());
   $("#hide").html(ich.accept());
   $("#footer").html(ich.footer({
@@ -51,11 +58,32 @@ $(document).on("dragleave", ".image", function () {
 $(document).on("dragend", ".image", function () {
   return false;
 });
+$(document).on("input", ".image > input", function () {
+  var container = $(this).parent();
+  var comparison = container.parent().index();
+  var column = container.index() - 1;
+  var file = IMAGES[comparison][column];
+  file.goodName = $(this).val() + "." + nameAndExt(file.goodName)[1];
+  console.log(file.goodName);
+});
+$(document).on("input", "#rename > input", function () {
+  var column = $(this).index() - 1;
+  COLUMNS[column] = $(this).val();
+  $(".image:nth-child("+(column + 2)+")").each(function (comparison) {
+    $(this).find('input[type="text"]').toggle(IMAGES[comparison][column] && !COLUMNS[column]);
+  });
+});
 
 // Image Uploader
 function load(container, file) {
-  IMAGES[container.parent().index()][container.index() - 1] = file;
+  file.goodName = file.name;
+  var comparison = container.parent().index();
+  var column = container.index() - 1;
+
+  IMAGES[comparison][column] = file;
   container.find("img").attr("src", window.URL.createObjectURL(file));
+  container.find('input[type="text"]').val(nameAndExt(file.goodName)[0]).show();
+
   sha1(file).then(function (hash) {
     file.sha1 = hash;
     SHAS[hash] = false;
@@ -166,10 +194,33 @@ function uploadAllImages() {
 }
 
 function upload(file) {
-  $("#upload > h1").html(ich.uploading_image({filename: file.name}));
+  $("#upload > h1").html(ich.uploading_image({filename: file.goodName}));
   $("#upload > img").attr("src", window.URL.createObjectURL(file));
+
+  // Caching this lookup for performance causes headaches, so YOLO
+  var comparison, column;
+  _.each(IMAGES, function (data, _comparison) {
+    _.each(data, function (_file, _column) {
+      if (file.sha1 === _file.sha1) {
+        if (comparison && column) {
+          // You tried to upload the same file twice. Goddammit.
+          throw new Error(ich.duplicate_file_error.text());
+        } else {
+          comparison = _comparison;
+          column = _column;
+        }
+      }
+    });
+  });
+
+  var filename = file.goodName;
+  if (COLUMNS[column]) {
+    filename = COLUMNS[column] + "." + nameAndExt(file.goodName)[1];
+  }
+
   var data = new FormData();
   data.append("image", file);
+  data.append("filename", filename);
   return RSVP.resolve($.ajax({
     type: "POST",
     url: "/upload",
