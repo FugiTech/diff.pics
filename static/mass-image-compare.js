@@ -206,18 +206,21 @@
 
     function compare(images, ignoreColor, onProgress) {
       var complete = 0;
-      var total = images.length * (images.length - 1) / 2.0;
-      onProgress(complete / total);
+      onProgress(complete/ images.length);
 
-      return RSVP.all(_.map(images, getImageData)).then(function (images) {
+      return RSVP.all(_.map(images, function (img) {
+        return getImageData(img).then(function (data) {
+          // Report progress on loading the images, since comparison is so fast
+          onProgress(++complete / images.length);
+          return data;
+        });
+      })).then(function (data) {
         var comparisons = [];
 
-        _.each(images, function (a, i) {
-          _.each(_.slice(images, i+1), function (b, j) {
+        _.each(data, function (a, i) {
+          _.each(_.slice(data, i+1), function (b, j) {
             j += i + 1;
             comparisons.push({a: i, b: j, p: compareIndividual(a, b, ignoreColor)});
-            complete++;
-            onProgress(complete / total);
           });
         });
 

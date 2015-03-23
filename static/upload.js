@@ -394,6 +394,13 @@ function magic(files) {
       if (a in done) return;
       var d = _.min(comparisons[a]);
       var b = _.indexOf(comparisons[a], d);
+
+      // Uhh, something went terribly wrong and let's just ignore it
+      // But seriously, this is typically caused by users trying to compare files
+      // with different resolutions, which we don't support.
+      // 90% is a nice magic number that seems to work pretty well
+      if (d > 90) return;
+
       done[a] = done[b] = true;
       together.push([d, a, b]);
     });
@@ -426,5 +433,7 @@ function magic(files) {
     recalculateColumn(1);
 
     console.debug("Time spent during Mass Compare: "+(Date.now() - start)+"ms");
+  }).catch(function (e) {
+    $("#wizard > h1").html(ich.error({error_message: e.message}));
   });
 };
