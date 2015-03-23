@@ -1,6 +1,7 @@
 // Requires RSVP.js and lodash.js
 // Steals a lot of ideas from resemble.js and rusha.js
 (function () {
+  var DOWNSCALE = 16; // Set to 1 to disable. (Not 0!!!)
 
   // If we'e running in Node.JS, export a module.
   if (typeof module !== 'undefined') {
@@ -87,13 +88,11 @@
     };
   }
 
-  function MassImageCompare(workerFile, imagePoolSize, canvasPoolSize, workerPoolSize) {
+  function MassImageCompare(imagePoolSize, canvasPoolSize) {
     "use strict";
 
-    workerFile = workerFile || "mass-image-compare.js";
     imagePoolSize = imagePoolSize || 20;
     canvasPoolSize = canvasPoolSize || 20;
-    workerPoolSize = workerPoolSize || navigator.hardwareConcurrency * 2 || 4;
 
     var imagePool = new Pool(imagePoolSize, function () {
       return document.createElement("img");
@@ -101,10 +100,6 @@
 
     var canvasPool = new Pool(canvasPoolSize, function () {
       return document.createElement("canvas");
-    });
-
-    var workerPool = new Pool(workerPoolSize, function () {
-      return new SimpleWorker(workerFile);
     });
 
 
@@ -137,12 +132,9 @@
         return d.promise;
       }).then(function () {
         var data;
-
-        // Naive downscaling to save time down the pipeline
-        // Shhh... nobody needs to know we do this...
-        var downscale = 4;
-        canvas.width = img.width / Math.pow(2, downscale);
-        canvas.height = img.height / Math.pow(2, downscale);
+        
+        canvas.width = img.width / DOWNSCALE;
+        canvas.height = img.height / DOWNSCALE;
         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
         data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
 
@@ -152,48 +144,6 @@
       });
     };
 
-    function compareIndividual(a, b, ignoreColor) {
-      // Generates a percentage mismatch between a and b
-      var worker;
-      return workerPool.acquire().then(function (w) {
-        worker = w;
-        return worker.send({a: a, b: b, ignoreColor: ignoreColor});
-      }).then(function (data) {
-        workerPool.release(worker);
-        if (data.error) throw data.error;
-        return data.percentage;
-      });
-    };
-
-    function compare(images, ignoreColor, onProgress) {
-      var complete = 0;
-      var total = images.length * (images.length - 1) / 2.0;
-      onProgress(complete / total);
-
-      return RSVP.all(_.map(images, getImageData)).then(function (images) {
-        var comparisons = [];
-
-        _.each(images, function (a, i) {
-          _.each(_.slice(images, i+1), function (b, j) {
-            j += i + 1;
-            comparisons.push(compareIndividual(a, b, ignoreColor).then(function (p) {
-              complete++;
-              onProgress(complete / total);
-              return {a: i, b: j, p: p};
-            }));
-          });
-        });
-
-        return RSVP.all(comparisons);
-      });
-    };
-
-    return {
-      compare: compare,
-    };
-  };
-
-  function MassImageCompareWorker() {
     function getPixel(data, offset) {
       var r, g, b, a;
 
@@ -219,7 +169,7 @@
       return a === b || Math.abs(a - b) < 16;
     }
 
-    function compare(a, b, ignoreColor) {
+    function compareIndividual(a, b, ignoreColor) {
       var width, height, pa, pb, offset, mismatch;
       // Don't bother comparing different sized images
       if (a.width !== b.width || a.height !== b.height)
@@ -252,6 +202,27 @@
       }
 
       return (mismatch / (height * width) * 100).toFixed(2);
+    };
+
+    function compare(images, ignoreColor, onProgress) {
+      var complete = 0;
+      var total = images.length * (images.length - 1) / 2.0;
+      onProgress(complete / total);
+
+      return RSVP.all(_.map(images, getImageData)).then(function (images) {
+        var comparisons = [];
+
+        _.each(images, function (a, i) {
+          _.each(_.slice(images, i+1), function (b, j) {
+            j += i + 1;
+            comparisons.push({a: i, b: j, p: compareIndividual(a, b, ignoreColor)});
+            complete++;
+            onProgress(complete / total);
+          });
+        });
+
+        return comparisons;
+      });
     };
 
     return {

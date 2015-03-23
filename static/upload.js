@@ -2,7 +2,7 @@ var COLUMNS = ["",""];
 var IMAGES = [];
 var SHAS = {};
 var RUSHA = new Worker("static/rusha.js");
-var COMPARE = MassImageCompare("static/mass-image-compare.js");
+var COMPARE = MassImageCompare();
 var JOBS = {}, LAST_JOB_ID = 0;
 
 RSVP.on("error", function (e) {
@@ -276,7 +276,10 @@ function submit() {
 var hideMagic = _.debounce(function () { $("#magic").hide(); }, 100);
 
 $(document).on("dragover", function (e) {
-  $("#magic").toggle(e.originalEvent.dataTransfer.items.length > 1);
+  // Browser hacks to figure out how many items they want to drop
+  var data = e.originalEvent.dataTransfer;
+  var count = data.mozItemCount || data.items.length;
+  $("#magic").toggle(count > 1);
   hideMagic();
   return false;
 });
@@ -299,6 +302,7 @@ function magic(files) {
   });
 
   var images = _.pluck(files, "url");
+  $("#wizard > div").empty();
   _.each(images, function (image) {
     $("#wizard > div").append($("<img>").attr("src", image));
   });
