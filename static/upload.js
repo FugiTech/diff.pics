@@ -42,8 +42,14 @@ $(function () {
     containment: "parent",
     cursor: "row-resize",
     handle: ".number",
-    //change: function () { debugger; },
-    update: recalculateComparisons
+    update: function (event, ui) {
+      var row = $(ui.item[0]);
+      var oldIndex = row.find(".number").text() * 1 - 1;
+      var newIndex = row.index();
+      var data = IMAGES.splice(oldIndex, 1);
+      IMAGES.splice(newIndex, 0, data[0]);
+      recalculateComparisons();
+    }
   });
   createComparison();
 });
