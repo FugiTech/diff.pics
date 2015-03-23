@@ -9,16 +9,6 @@ RSVP.on("error", function (e) {
   console.error(e);
 });
 
-function stringInject(message, injector) {
-  return _.chain(injector)
-          .repeat(message.length)
-          .chunk(injector.length)
-          .zip(message)
-          .flatten(true)
-          .value()
-          .join("");
-}
-
 function nameAndExt(filename) {
   var a = filename.split(".");
   if (a.length <= 1) return [a[0], "png"]; // Uh oh
@@ -37,13 +27,24 @@ $(function () {
   $("#title").attr("placeholder", ich.comparison_title().text());
   $("#add").html(ich.add_comparison());
   $("#rename > h3").html(ich.rename_comparison());
+  $("#swap").html(ich.swap_columns());
   $("#submit").html(ich.submit_comparison());
   $("#hide").html(ich.accept());
   $("#footer").html(ich.footer({
     "github": '<a href="https://github.com/Fugiman/diff.pics/issues">Github</a>',
     "twitter": '<a href="https://twitter.com/fugiman">Twitter</a>'
   }));
+  $("#magic").html(ich.magic_prompt());
+  $("#wizard > h1").html(ich.wizard_title());
 
+  $("#comparisons").sortable({
+    axis: "y",
+    containment: "parent",
+    cursor: "row-resize",
+    handle: ".number",
+    //change: function () { debugger; },
+    update: recalculateComparisons
+  });
   createComparison();
 });
 
@@ -61,30 +62,37 @@ $(document).on("dragend", ".image", function () {
 });
 $(document).on("input", ".image > input", function () {
   var container = $(this).parent();
-  var comparison = container.parent().index();
-  var column = container.index() - 1;
-  var file = IMAGES[comparison][column];
+  var file = getFileFor(container);
   file.goodName = $(this).val() + "." + nameAndExt(file.goodName)[1];
   console.log(file.goodName);
 });
 $(document).on("input", "#rename > input", function () {
-  var column = $(this).index() - 1;
-  COLUMNS[column] = $(this).val();
-  $(".image:nth-child("+(column + 2)+")").each(function (comparison) {
-    $(this).children('input').toggle(IMAGES[comparison][column] && !COLUMNS[column]);
-  });
+  recalculateColumn($(this).index() - 1);
 });
 
 // Image Uploader
-function load(container, file) {
-  file.url = file.url || window.URL.createObjectURL(file);
-  file.goodName = file.name;
+function getFileFor(container) {
   var comparison = container.parent().index();
   var column = container.index() - 1;
-
+  return IMAGES[comparison][column];
+};
+function load(container, file) {
+  var comparison = container.parent().index();
+  var column = container.index() - 1;
   IMAGES[comparison][column] = file;
+
+  if (!file) {
+    container.find("img").attr("src", "");
+    container.children('input').val("").hide();
+    return;
+  }
+
+  file.container = container;
+  file.url = file.url || window.URL.createObjectURL(file);
+  file.goodName = file.name;
+
   container.find("img").attr("src", file.url);
-  container.children('input').val(nameAndExt(file.goodName)[0]).show();
+  container.children('input').val(nameAndExt(file.goodName)[0]).toggle(!COLUMNS[column]);
 
   sha1(file).then(function (hash) {
     file.sha1 = hash;
@@ -93,8 +101,18 @@ function load(container, file) {
   });
 }
 $(document).on("drop", ".image", function (e) {
-  $(this).removeClass("hover");
-  load($(this), e.originalEvent.dataTransfer.files[0]);
+  var target = $(this);
+  var data = e.originalEvent.dataTransfer;
+  target.removeClass("hover");
+  if (data.files.length) {
+    load(target, data.files[0]);
+  } else {
+    var file = _.chain(IMAGES).flatten().find("url", data.getData("URL")).value();
+    var replaced = getFileFor(target);
+    var source = file.container;
+    load(target, file);
+    load(source, replaced);
+  }
   return false;
 });
 $(document).on("change", ".image > .button > input", function () {
@@ -108,32 +126,64 @@ function createComparison() {
   var num = $("#comparisons > div").length + 1;
   var row = ich.comparison({
     number: num,
-    remove: stringInject(ich.remove_comparison().text(), "<br>"),
+    remove: ich.remove_comparison().html(),
     drop: ich.upload_drop().html(),
     or: ich.upload_or().html(),
     browse: ich.upload_browse().html()
   });
   if (num >= 10) row.find(".number").addClass("large-number");
   $("#comparisons").append(row);
+  $("#comparisons").sortable("refresh");
 };
-function removeComparison(index) {
-  IMAGES.splice(index, 1);
-
-  $("#comparisons > div:nth-child("+(index + 1)+")").remove();
+function recalculateComparisons() {
   $(".comparison").each(function (index) {
     $(this).find(".number").text(index + 1).toggleClass("large-number", index >= 10);
   });
-}
+  $("#comparisons").sortable("refresh");
+};
+function recalculateColumn(column) {
+  COLUMNS[column] = $("#rename > input:nth-child("+(column + 2)+")").val();
+  $(".image:nth-child("+(column + 2)+")").each(function (comparison) {
+    $(this).children('input').toggle(IMAGES[comparison][column] && !COLUMNS[column]);
+  });
+};
+function removeComparison(index) {
+  IMAGES.splice(index, 1);
+  $("#comparisons > div:nth-child("+(index + 1)+")").remove();
+  recalculateComparisons();
+};
 
 $(document).on("click", "#add", function () {
   createComparison();
+  return false;
 });
 $(document).on("click", ".remove", function () {
   removeComparison($(this).parent().index());
+  return false;
+});
+$(document).on("click", "#swap", function () {
+  // First, swap the titles
+  var t = COLUMNS[1];
+  COLUMNS[1] = COLUMNS[0];
+  COLUMNS[0] = t;
+  $("#rename > input:nth-child(2)").val(COLUMNS[0]);
+  $("#rename > input:nth-child(3)").val(COLUMNS[1]);
+
+  // Now swap all the files
+  _.each(IMAGES, function (comparison) {
+    var a = comparison[0],
+        b = comparison[1],
+        ac = a.container,
+        bc = b.container;
+    load(ac, b);
+    load(bc, a);
+  });
+  return false;
 });
 
 // Sha1 calculation
 function sha1(file) {
+  if (file.sha1) return RSVP.resolve(file.sha1);
   var job_id = ++LAST_JOB_ID;
   var d = RSVP.defer();
   JOBS[job_id] = d;
@@ -167,11 +217,13 @@ $(document).on("click", "#submit", function () {
     $("#upload > progress").hide();
     $("#hide").show();
   });
+  return false;
 });
 
 $(document).on("click", "#hide", function () {
   $("#hide").hide();
   $("#upload").hide();
+  return false;
 });
 
 function remaining() {
@@ -279,7 +331,8 @@ $(document).on("dragover", function (e) {
   // Browser hacks to figure out how many items they want to drop
   var data = e.originalEvent.dataTransfer;
   var count = data.mozItemCount || data.items.length;
-  $("#magic").toggle(count > 1);
+  var show = count > 1 && _.includes(data.types, "Files");
+  $("#magic").toggle(show);
   hideMagic();
   return false;
 });
@@ -356,13 +409,15 @@ function magic(files) {
     var column_title = function (v, i) {
       v = _.chain(v).unzip().map(_.uniq).filter("length", 1).flatten().value().join(" ");
       i = $(i);
-      if (v && !i.val()) i.val(v).trigger("input");
+      if (v && !i.val()) i.val(v);
       return v;
     };
     column_title([
       _.words(column_title(awords, "#rename > input:nth-child(2)")),
       _.words(column_title(bwords, "#rename > input:nth-child(3)"))
     ], "#title");
+    recalculateColumn(0);
+    recalculateColumn(1);
 
     console.debug("Time spent during Mass Compare: "+(Date.now() - start)+"ms");
   });

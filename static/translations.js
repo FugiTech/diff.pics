@@ -20,29 +20,32 @@ var urlParams;
   }
 
   console.info("Loaded localized text for:", userLanguage);
-  if (languages[userLanguage]) {
-    _.each(languages[userLanguage], function (template, key) {
-      ich.addTemplate(key, '<span>'+template+'</span>');
-    });
-  }
 
   // Graceful fallback to EN if some templates aren't defined in other languages
-  _.each(languages["en"], function (template, key) {
-    if (_.isUndefined(ich[key])) {
-      ich.addTemplate(key, '<span>'+template+'</span>');
-    }
+  _.each([userLanguage, "en"], function (language) {
+    if (!languages[language]) return;
+
+    _.each(languages[language], function (template, key) {
+      if (_.isUndefined(ich[key])) {
+        ich.addTemplate(key, '<span>'+template.replace(/\n/g,"<br>")+'</span>');
+      }
+    });
   });
 })({
   "en": {
     "comparison_title": "Comparison Title",
     "add_comparison": "Add Comparison",
     "rename_comparison": "Mass Rename",
+    "swap_columns": "Swap Columns",
     "submit_comparison": "Submit Comparisons",
-    "remove_comparison": "DELETE",
+    "remove_comparison": "\nD\nE\nL\nE\nT\nE",
 
     "upload_drop": "Drop Image Here",
     "upload_or": "or",
     "upload_browse": "Browse file...",
+
+    "magic_prompt": "Dragging more than one file at a time doesn't work with the manual UI.\nHowever, we can try to figure out what images to compare automatically.\nDrop your files anywhere on the page to try it out!",
+    "wizard_title": "Auto-Magic Image Comparison Calculator",
 
     "uploading_search": "Finding remaining images to upload",
     "uploading_image": "Uploading {{filename}}",

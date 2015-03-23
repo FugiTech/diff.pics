@@ -29,16 +29,22 @@ img[src=""] {
     border: 3px solid #666;
 }
 
-.comparison {
-    margin: 20px auto;
-    height: 220px;
+#comparisons {
+    margin: auto;
     width: 900px;
+    padding: 10px 0;
+}
+
+.comparison {
+    margin: 20px 0;
+    height: 220px;
     border: 2px solid #444;
     border-radius: 100px;
     text-align: left;
 }
 
 .number {
+    cursor: row-resize;
     vertical-align: top;
     display: inline-block;
     margin: 10px;
@@ -78,6 +84,7 @@ img[src=""] {
     width: 356px;
     height: 200px;
     z-index: 2;
+    cursor: move;
 }
 
 .image > strong {
@@ -165,7 +172,7 @@ img[src=""] {
 }
 
 #add {
-    margin: 20px auto;
+    margin: 10px auto;
     height: 30px;
     width: 900px;
     color: #CCC;
@@ -210,6 +217,22 @@ img[src=""] {
 
 #rename > input:hover {
     background: #666;
+}
+
+#swap {
+    margin: 20px auto;
+    height: 30px;
+    width: 900px;
+    color: #CCC;
+    background: #444;
+    border-radius: 15px;
+    line-height: 30px;
+    font-size: 24px;
+}
+
+#swap:hover {
+    background: #666;
+    cursor: pointer;
 }
 
 #submit {
