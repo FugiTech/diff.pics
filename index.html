@@ -7,7 +7,8 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,700">
-    <link rel="stylesheet" href="static/upload.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/upload.css">
   </head>
   <body>
     <br>
@@ -20,6 +21,7 @@
       <input type="text">
     </div>
     <div id="swap"></div>
+    <div id="beta"></div>
     <div id="submit"></div>
 
     <div id="upload">
@@ -42,10 +44,10 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/ICanHaz.js/0.10.3/ICanHaz.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
-    <script src="static/rsvp.js"></script>
-    <script src="static/mass-image-compare.js"></script>
-    <script src="static/translations.js"></script>
-    <script src="static/upload.js"></script>
+    <script src="/static/rsvp.js"></script>
+    <script src="/static/mass-image-compare.js"></script>
+    <script src="/static/translations.js"></script>
+    <script src="/static/upload.js"></script>
 
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -55,6 +57,7 @@
 
       ga('create', 'UA-59995668-1', 'auto');
       ga('send', 'pageview');
+      window.addEventListener('popstate', function () { ga('send', 'pageview'); });
     </script>
   </body>
 </html>
@@ -81,4 +84,23 @@
     </div>
     <input class="imageName" type="text">
   </div>
+</script>
+
+<script id="beta_contents" type="text/html">
+  <h3>
+    <i class="fa fa-exclamation-triangle"></i>
+    <i class="fa fa-exclamation-triangle"></i>
+    <i class="fa fa-exclamation-triangle"></i>
+    &nbsp;
+    <i class="fa fa-flask"></i>
+    &nbsp;
+    EXPERIMENTAL FEATURE LAB
+    &nbsp;
+    <i class="fa fa-flask"></i>
+    &nbsp;
+    <i class="fa fa-exclamation-triangle"></i>
+    <i class="fa fa-exclamation-triangle"></i>
+    <i class="fa fa-exclamation-triangle"></i>
+  </h3>
+  <audio src="//cdn.diff.pics/_/party.mp3" autoplay loop controls>
 </script>

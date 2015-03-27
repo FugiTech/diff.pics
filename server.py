@@ -104,8 +104,10 @@ def submit():
     return key
 
 @get("/<key>")
+@get("/<key>/<index>")
 @view("comparison")
-def comparison(key):
+def comparison(key, index=None):
+    # We ignore index here anyway, /static/view.js is what handles it
     try:
         c = comparisons.get_item(key=key, consistent=True)
     except ItemNotFound:

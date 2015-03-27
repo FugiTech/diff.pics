@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,700">
-    <link rel="stylesheet" href="static/view.css">
+    <link rel="stylesheet" href="/static/view.css">
     <script>COMPARISONS = {{!comparisons}}</script>
   </head>
   <body>
@@ -30,9 +30,9 @@
     <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/ICanHaz.js/0.10.3/ICanHaz.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
-    <script src="static/rsvp.js"></script>
-    <script src="static/translations.js"></script>
-    <script src="static/view.js"></script>
+    <script src="/static/rsvp.js"></script>
+    <script src="/static/translations.js"></script>
+    <script src="/static/view.js"></script>
 
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -42,6 +42,7 @@
 
       ga('create', 'UA-59995668-1', 'auto');
       ga('send', 'pageview');
+      window.addEventListener('popstate', function () { ga('send', 'pageview'); });
     </script>
   </body>
 </html>

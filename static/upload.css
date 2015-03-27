@@ -370,3 +370,92 @@ img[src=""] {
     width: 178px;
     height: 100px;
 }
+
+
+/* Beta funtimes */
+.beta-enabled,
+.beta-enabled body,
+.beta-enabled #title,
+.beta-enabled button {
+    -webkit-animation: rainbow 2s infinite;
+        -ms-animation: rainbow 2s infinite;
+         -o-animation: rainbow 2s infinite;
+            animation: rainbow 2s infinite;
+}
+
+#beta {
+    box-sizing: border-box;
+    display: none;
+    width: 900px;
+    margin: 20px auto;
+    border: 4px dashed #F60;
+    border-radius: 10px;
+    padding: 24px;
+    color: #F60;
+}
+
+.beta-enabled #beta {
+    display: block;
+}
+
+#beta h3 {
+    margin-top: 0;
+}
+
+#beta audio {
+    display: block;
+    width: 100%;
+}
+
+@-webkit-keyframes rainbow {
+      0% { background-color: hsl(  0, 100%, 20%); }
+     10% { background-color: hsl( 36, 100%, 20%); }
+     20% { background-color: hsl( 72, 100%, 20%); }
+     30% { background-color: hsl(108, 100%, 20%); }
+     40% { background-color: hsl(144, 100%, 20%); }
+     50% { background-color: hsl(180, 100%, 20%); }
+     60% { background-color: hsl(216, 100%, 20%); }
+     70% { background-color: hsl(252, 100%, 20%); }
+     80% { background-color: hsl(288, 100%, 20%); }
+     90% { background-color: hsl(324, 100%, 20%); }
+    100% { background-color: hsl(360, 100%, 20%); }
+}
+@-ms-keyframes rainbow {
+      0% { background-color: hsl(  0, 100%, 20%); }
+     10% { background-color: hsl( 36, 100%, 20%); }
+     20% { background-color: hsl( 72, 100%, 20%); }
+     30% { background-color: hsl(108, 100%, 20%); }
+     40% { background-color: hsl(144, 100%, 20%); }
+     50% { background-color: hsl(180, 100%, 20%); }
+     60% { background-color: hsl(216, 100%, 20%); }
+     70% { background-color: hsl(252, 100%, 20%); }
+     80% { background-color: hsl(288, 100%, 20%); }
+     90% { background-color: hsl(324, 100%, 20%); }
+    100% { background-color: hsl(360, 100%, 20%); }
+}
+@-o-keyframes rainbow {
+      0% { background-color: hsl(  0, 100%, 20%); }
+     10% { background-color: hsl( 36, 100%, 20%); }
+     20% { background-color: hsl( 72, 100%, 20%); }
+     30% { background-color: hsl(108, 100%, 20%); }
+     40% { background-color: hsl(144, 100%, 20%); }
+     50% { background-color: hsl(180, 100%, 20%); }
+     60% { background-color: hsl(216, 100%, 20%); }
+     70% { background-color: hsl(252, 100%, 20%); }
+     80% { background-color: hsl(288, 100%, 20%); }
+     90% { background-color: hsl(324, 100%, 20%); }
+    100% { background-color: hsl(360, 100%, 20%); }
+}
+@keyframes rainbow {
+      0% { background-color: hsl(  0, 100%, 20%); }
+     10% { background-color: hsl( 36, 100%, 20%); }
+     20% { background-color: hsl( 72, 100%, 20%); }
+     30% { background-color: hsl(108, 100%, 20%); }
+     40% { background-color: hsl(144, 100%, 20%); }
+     50% { background-color: hsl(180, 100%, 20%); }
+     60% { background-color: hsl(216, 100%, 20%); }
+     70% { background-color: hsl(252, 100%, 20%); }
+     80% { background-color: hsl(288, 100%, 20%); }
+     90% { background-color: hsl(324, 100%, 20%); }
+    100% { background-color: hsl(360, 100%, 20%); }
+}

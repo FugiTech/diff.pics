@@ -437,3 +437,30 @@ function magic(files) {
     $("#wizard > h1").html(ich.error({error_message: e.message}));
   });
 };
+
+// The experiment lab - Fun shit goes here
+var BETA_INITIALIZED = false;
+var BETA_ENABLED = false;
+$(document).on("keydown", function (e) {
+  if (e.keyCode !== 18) return;
+  if (BETA_ENABLED) return;
+
+  if (!BETA_INITIALIZED) {
+    BETA_INITIALIZED = true;
+    $("#beta").append(ich.beta_contents());
+  }
+
+  BETA_ENABLED = true;
+  $("#beta audio").each(function () { this.play(); });
+  $("html").addClass("beta-enabled");
+  console.log("LAB ACTIVATE");
+});
+$(document).on("keyup", function (e) {
+  if (e.keyCode !== 18) return;
+  if (!BETA_ENABLED) return;
+
+  BETA_ENABLED = false;
+  $("#beta audio").each(function () { this.pause(); });
+  $("html").removeClass("beta-enabled");
+  console.log("LAB DEACTIVATE");
+});
