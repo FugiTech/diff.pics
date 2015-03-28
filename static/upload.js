@@ -441,26 +441,42 @@ function magic(files) {
 // The experiment lab - Fun shit goes here
 var BETA_INITIALIZED = false;
 var BETA_ENABLED = false;
+var BETA_CLICK_AUDIO = ["omg", "air_horn"];
+
+function initializeBeta() {
+  BETA_INITIALIZED = true;
+  BETA_CLICK_AUDIO = _.map(BETA_CLICK_AUDIO, function (mp3name) {
+    var url = "http://cdn.diff.pics/_/"+mp3name+".mp3";
+    var audio = new Audio(url);
+    audio.preload = "auto";
+    audio.load();
+    return audio;
+  });
+  $("#beta").append(ich.beta_contents({
+    add_column: ich.add_column().html()
+  }));
+};
+function refreshBeta() {
+  $("#beta audio").each(function () { BETA_ENABLED ? this.play() : this.pause(); });
+  $("html").toggleClass("beta-enabled", BETA_ENABLED);
+};
+
+// Show/Hide the experiment lab
 $(document).on("keydown", function (e) {
-  if (e.keyCode !== 18) return;
-  if (BETA_ENABLED) return;
+  if (e.keyCode !== 27) return; // ESC
+  if (!BETA_INITIALIZED) initializeBeta();
 
-  if (!BETA_INITIALIZED) {
-    BETA_INITIALIZED = true;
-    $("#beta").append(ich.beta_contents());
-  }
-
-  BETA_ENABLED = true;
-  $("#beta audio").each(function () { this.play(); });
-  $("html").addClass("beta-enabled");
-  console.log("LAB ACTIVATE");
+  BETA_ENABLED = !BETA_ENABLED;
+  refreshBeta();
 });
-$(document).on("keyup", function (e) {
-  if (e.keyCode !== 18) return;
-  if (!BETA_ENABLED) return;
-
+$(document).on("click", "#beta a", function () {
   BETA_ENABLED = false;
-  $("#beta audio").each(function () { this.pause(); });
-  $("html").removeClass("beta-enabled");
-  console.log("LAB DEACTIVATE");
+  refreshBeta();
+});
+
+// Play fun sound effects when you try to use the experiment lab buttons
+$(document).on("click", "#beta div", function () {
+  var i = Math.floor(Math.random() * BETA_CLICK_AUDIO.length);
+  var audio = BETA_CLICK_AUDIO[i];
+  audio.play();
 });

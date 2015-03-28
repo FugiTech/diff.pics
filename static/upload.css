@@ -386,6 +386,7 @@ img[src=""] {
 #beta {
     box-sizing: border-box;
     display: none;
+    position: relative;
     width: 900px;
     margin: 20px auto;
     border: 4px dashed #F60;
@@ -398,6 +399,20 @@ img[src=""] {
     display: block;
 }
 
+#beta a {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    font-size: 18px;
+    font-weight: bold;
+}
+#beta a:hover {
+    top: 6px;
+    right: 10px;
+    font-size: 26px;
+    cursor: pointer;
+}
+
 #beta h3 {
     margin-top: 0;
 }
@@ -405,6 +420,22 @@ img[src=""] {
 #beta audio {
     display: block;
     width: 100%;
+}
+
+#beta div {
+    margin: 10px auto;
+    height: 30px;
+    width: 800px;
+    color: #CCC;
+    background: #444;
+    border-radius: 15px;
+    line-height: 30px;
+    font-size: 24px;
+}
+
+#beta div:hover {
+    background: #666;
+    cursor: pointer;
 }
 
 @-webkit-keyframes rainbow {

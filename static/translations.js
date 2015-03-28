@@ -40,6 +40,8 @@ var urlParams;
     "submit_comparison": "Submit Comparisons",
     "remove_comparison": "\nD\nE\nL\nE\nT\nE",
 
+    "add_column": "Add Column",
+
     "upload_drop": "Drop Image Here",
     "upload_or": "or",
     "upload_browse": "Browse file...",
