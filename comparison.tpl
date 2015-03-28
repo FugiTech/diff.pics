@@ -30,6 +30,7 @@
     <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/ICanHaz.js/0.10.3/ICanHaz.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/URI.js/1.11.2/URI.min.js"></script>
     <script src="/static/rsvp.js"></script>
     <script src="/static/translations.js"></script>
     <script src="/static/view.js"></script>
@@ -42,7 +43,6 @@
 
       ga('create', 'UA-59995668-1', 'auto');
       ga('send', 'pageview');
-      window.addEventListener('popstate', function () { ga('send', 'pageview'); });
     </script>
   </body>
 </html>
