@@ -72,8 +72,8 @@ $(document).on("input", ".image > input", function () {
   file.goodName = $(this).val() + "." + nameAndExt(file.goodName)[1];
   console.log(file.goodName);
 });
-$(document).on("input", "#rename > input", function () {
-  recalculateColumn($(this).index() - 1);
+$(document).on("input", "#rename input", function () {
+  recalculateColumn($(this).index());
 });
 
 // Image Uploader
@@ -152,8 +152,8 @@ function recalculateComparisons() {
   $("#comparisons").sortable("refresh");
 };
 function recalculateColumn(column) {
-  COLUMNS[column] = $("#rename > input:nth-child("+(column + 2)+")").val();
-  $(".image:nth-child("+(column + 2)+")").each(function (comparison) {
+  COLUMNS[column] = $("#rename input:nth-child("+(column + 1)+")").val();
+  $(".image:nth-child("+(column + 1)+")").each(function (comparison) {
     $(this).children('input').toggle(IMAGES[comparison][column] && !COLUMNS[column]);
   });
 };
@@ -176,8 +176,8 @@ $(document).on("click", "#swap", function () {
   var t = COLUMNS[1];
   COLUMNS[1] = COLUMNS[0];
   COLUMNS[0] = t;
-  $("#rename > input:nth-child(2)").val(COLUMNS[0]);
-  $("#rename > input:nth-child(3)").val(COLUMNS[1]);
+  $("#rename input:nth-child(1)").val(COLUMNS[0]);
+  $("#rename input:nth-child(2)").val(COLUMNS[1]);
 
   // Now swap all the files
   _.each(IMAGES, function (comparison) {
@@ -219,6 +219,7 @@ function checkSha(hash) {
 $(document).on("click", "#submit", function () {
   $("#upload > progress").show();
   $("#upload").show();
+  $("body").scrollTop(0);
   uploadAllImages().then(function () {
     return submit();
   }).catch(function (e) {
@@ -341,7 +342,7 @@ function submit() {
 }
 
 // Magical Auto-comparison bullshit
-var hideMagic = _.debounce(function () { $("#magic").hide(); }, 100);
+var hideMagic = _.debounce(function () { $("#magic").hide(); }, 200);
 
 $(document).on("dragover", function (e) {
   // Browser hacks to figure out how many items they want to drop
@@ -399,33 +400,43 @@ function magic(files) {
 
     var done = {};
     var together = [];
-    var last_b = 0;
     _.each(_.range(files.length), function (a) {
       if (a in done) return;
-      var d = _.min(comparisons[a]);
-      var b = _.indexOf(comparisons[a], d);
 
-      // Uhh, something went terribly wrong and let's just ignore it
-      // But seriously, this is typically caused by users trying to compare files
-      // with different resolutions, which we don't support.
-      // 90% is a nice magic number that seems to work pretty well
-      if (d > 90) return;
+      var d = 0, t = [a];
+      while (t.length < COLUMNS.length) {
+        do {
+          var td = _.min(comparisons[a]);
+          var b = _.indexOf(comparisons[a], td);
+          comparisons[a][b] = 100;
+        } while (b in done);
 
-      done[a] = done[b] = true;
-      together.push([d, a, b]);
+        // Uhh, something went terribly wrong and let's just ignore it
+        // But seriously, this is typically caused by users trying to compare files
+        // with different resolutions, which we don't support.
+        // 90% is a nice magic number that seems to work pretty well
+        if (td > 90) return;
+
+        d += td;
+        t.push(b);
+      }
+
+      _.each(t, function (i) {
+        done[i] = true;
+      });
+      together.push([d, _.sortBy(t)]);
     });
 
-    var awords = [], bwords = [];
+    var words = _.map(COLUMNS, function () { return []; });
     _.each(_.sortByOrder(together, [0], [false]), function (i, n) {
-      console.info("Comparison #" + (n+1) + " is " + i[0] + "% different");
+      console.info("Comparison #" + (n+1) + " is " + i[0]/i[1].length + "% different on average");
       createComparison();
-      var containers = $("#comparisons > div:last-child .image");
-      var a = files[i[1]], b = files[i[2]];
-      load($(containers[0]), a);
-      load($(containers[1]), b);
-
-      awords.push(_.words(nameAndExt(a.goodName)[0]));
-      bwords.push(_.words(nameAndExt(b.goodName)[0]));
+      var containers = $("#comparisons > .comparison:last-child .images").children();
+      _.each(i[1], function (j, k) {
+        var f = files[j];
+        load($(containers[k]), f);
+        words[k].push(_.words(nameAndExt(f.goodName)[0]));
+      });
     });
 
     // Try to set sane titles if we can
@@ -435,12 +446,12 @@ function magic(files) {
       if (v && !i.val()) i.val(v);
       return v;
     };
-    column_title([
-      _.words(column_title(awords, "#rename > input:nth-child(2)")),
-      _.words(column_title(bwords, "#rename > input:nth-child(3)"))
-    ], "#title");
-    recalculateColumn(0);
-    recalculateColumn(1);
+    var titles = _.map(words, function (w, i) {
+      var r = _.words(column_title(w, "#rename input:nth-child("+(i+1)+")"));
+      recalculateColumn(i);
+      return r;
+    });
+    column_title(titles, "#title");
 
     console.debug("Time spent during Mass Compare: "+(Date.now() - start)+"ms");
   }).catch(function (e) {
@@ -501,4 +512,5 @@ $(document).on("click", "#add_col", function () {
     or: ich.upload_or().html(),
     browse: ich.upload_browse().html()
   }));
+  $("#rename .inputs").append($("<input>").attr("type", "text"));
 });
