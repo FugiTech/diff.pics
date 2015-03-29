@@ -20,6 +20,32 @@ img[src=""] {
     border: 2px solid #999;
 }
 
+.subselect {
+    box-sizing: border-box;
+    display: inline-block;
+    background: #444;
+    border-radius: 15px;
+    height: 30px;
+    padding: 1px 15px;
+    margin: 5px;
+}
+
+.subselect:hover {
+    background: #666;
+    cursor: pointer;
+}
+
+.subselect .number {
+    vertical-align: middle;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.subselect .name {
+    vertical-align: middle;
+    font-size: 14px;
+}
+
 #comparison {
     position: relative;
     display: inline-block;

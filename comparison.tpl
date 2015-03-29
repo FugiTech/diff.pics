@@ -14,6 +14,7 @@
     <h1>{{title}}</h1>
 
     <div id="selector"></div>
+    <div id="subselector"></div>
 
     <div id="comparison">
       <h2 id="filename">
@@ -46,3 +47,11 @@
     </script>
   </body>
 </html>
+
+<script id="subselect" type="text/html">
+  <div class="subselect">
+    <span class="number">{{"{{number}}"}}</span>
+    &nbsp;
+    <span class="name">{{"{{name}}"}}</span>
+  </div>
+</script>

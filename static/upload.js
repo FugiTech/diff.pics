@@ -78,13 +78,13 @@ $(document).on("input", "#rename > input", function () {
 
 // Image Uploader
 function getFileFor(container) {
-  var comparison = container.parent().index();
-  var column = container.index() - 1;
+  var comparison = container.parent().parent().index();
+  var column = container.index();
   return IMAGES[comparison][column];
 };
 function load(container, file) {
-  var comparison = container.parent().index();
-  var column = container.index() - 1;
+  var comparison = container.parent().parent().index();
+  var column = container.index();
   IMAGES[comparison][column] = file;
 
   if (!file) {
@@ -132,10 +132,14 @@ function createComparison() {
   var num = $("#comparisons > div").length + 1;
   var row = ich.comparison({
     number: num,
-    remove: ich.remove_comparison().html(),
-    drop: ich.upload_drop().html(),
-    or: ich.upload_or().html(),
-    browse: ich.upload_browse().html()
+    remove: ich.remove_comparison().html()
+  });
+  _.each(COLUMNS, function () {
+    row.find(".images").append(ich.image({
+      drop: ich.upload_drop().html(),
+      or: ich.upload_or().html(),
+      browse: ich.upload_browse().html()
+    }));
   });
   if (num >= 10) row.find(".number").addClass("large-number");
   $("#comparisons").append(row);
@@ -303,9 +307,15 @@ function upload(file) {
   })).then(function (r) {
     $("#upload > img").attr("src", "");
     $("#upload > progress").attr("value", null);
+    var d = r.split(" ");
+    var actual_sha = nameAndExt(d.pop())[0];
+    var delimiter = d.pop();
+    var clean_name = d.join(" ");
 
-    if (r.split(" ")[1] != "=") {
+    if (delimiter != "=") {
       throw r;
+    } else if (actual_sha != file.sha1) {
+      //throw new Error("Checksum didn't match");
     }
   });
 }
@@ -479,4 +489,16 @@ $(document).on("click", "#beta div", function () {
   var i = Math.floor(Math.random() * BETA_CLICK_AUDIO.length);
   var audio = BETA_CLICK_AUDIO[i];
   audio.play();
+});
+
+$(document).on("click", "#add_col", function () {
+  var getClass = function () { return "cols-"+(COLUMNS.length>3?"many":COLUMNS.length); };
+  $("html").removeClass(getClass());
+  COLUMNS.push("");
+  $("html").addClass(getClass());
+  $(".comparison .images").append(ich.image({
+    drop: ich.upload_drop().html(),
+    or: ich.upload_or().html(),
+    browse: ich.upload_browse().html()
+  }));
 });

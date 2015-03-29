@@ -37,7 +37,7 @@ img[src=""] {
 
 .comparison {
     margin: 20px 0;
-    height: 220px;
+    /*height: 220px;*/
     border: 2px solid #444;
     border-radius: 100px;
     text-align: left;
@@ -60,9 +60,15 @@ img[src=""] {
     font-size: 60px;
 }
 
+.images {
+    display: inline-block;
+    width: 752px;
+    min-height: 220px;
+}
+
 .image {
     position: relative;
-    vertical-align: top;
+    vertical-align: middle;
     display: inline-block;
     box-sizing: border-box;
     margin: 10px;
@@ -151,6 +157,41 @@ img[src=""] {
 
 .image > input:hover {
     background: #666;
+}
+
+.cols-3 .images {
+    line-height: 220px;
+}
+.cols-3 .image,
+.cols-3 .image > img {
+    width: 230px;
+    height: 130px;
+    line-height: normal;
+}
+.cols-3 .image > strong {
+    margin-top: 20px;
+}
+.cols-3 .image > input {
+    width: 218px;
+}
+.cols-many .image,
+.cols-many .image > img {
+    width: 168px;
+    height: 95px;
+    font-size: 0.85em;
+}
+.cols-many .image > strong {
+    margin-top: 10px;
+}
+.cols-many .image > input {
+    width: 156px;
+}
+.cols-many .button,
+.cols-many .button > button,
+.cols-many .button > input {
+    width: 140px;
+    height: 20px;
+    font-size: 10px;
 }
 
 .remove {
@@ -373,14 +414,17 @@ img[src=""] {
 
 
 /* Beta funtimes */
-.beta-enabled,
-.beta-enabled body,
-.beta-enabled #title,
-.beta-enabled button {
+.beta-enabled {
     -webkit-animation: rainbow 2s infinite;
         -ms-animation: rainbow 2s infinite;
          -o-animation: rainbow 2s infinite;
             animation: rainbow 2s infinite;
+}
+
+.beta-enabled body,
+.beta-enabled #title,
+.beta-enabled button {
+    background: transparent;
 }
 
 #beta {

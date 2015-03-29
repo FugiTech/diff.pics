@@ -1,8 +1,6 @@
 // Requires RSVP.js and lodash.js
 // Steals a lot of ideas from resemble.js and rusha.js
 (function () {
-  var DOWNSCALE = 16; // Set to 1 to disable. (Not 0!!!)
-
   // If we'e running in Node.JS, export a module.
   if (typeof module !== 'undefined') {
     module.exports = MassImageCompare;
@@ -12,42 +10,6 @@
   // the MassImageCompare object to toplevel.
   else if (typeof window !== 'undefined') {
     window.MassImageCompare = MassImageCompare;
-  }
-
-  // If we're running in a webworker, accept
-  // messages containing a jobid and a buffer
-  // or blob object, and return the hash result.
-  if (typeof FileReaderSync !== 'undefined') {
-    var comparer = new MassImageCompareWorker();
-    self.onmessage = function (event) {
-      var comparisons, data = event.data;
-      try {
-        percentage = comparer.compare(data.a, data.b, data.ignoreColor);
-        self.postMessage({percentage: percentage});
-      } catch (e) {
-        self.postMessage({error: e.stack});
-      }
-    };
-  }
-
-  function SimpleWorker(workerFile) {
-    var worker = new Worker(workerFile);
-    var running = null;
-
-    function send(data) {
-      running = RSVP.defer();
-      worker.postMessage(data);
-      return running.promise;
-    };
-
-    worker.onmessage = function (event) {
-      running.resolve(event.data);
-      running = null;
-    };
-
-    return {
-      send: send,
-    };
   }
 
   function Pool(size, constructor) {
@@ -133,8 +95,9 @@
       }).then(function () {
         var data;
         
-        canvas.width = img.width / DOWNSCALE;
-        canvas.height = img.height / DOWNSCALE;
+        // Downscale to a height of 45px, maintaining aspect ratio
+        canvas.width = img.width / (img.height / 45);
+        canvas.height = 45;
         canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
         data = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
 
