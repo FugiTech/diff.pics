@@ -84,6 +84,7 @@ $(document).on("keydown", function (e) {
   if (p < 0 || p >= COMPARISONS[INDEX].length) return;
 
   setComparison(INDEX, p);
+  return false;
 });
 
 function loadComparison(index) {
