@@ -114,6 +114,7 @@ function setComparison(i, p) {
   if (i !== INDEX) {
     INDEX = i;
     ga('send', 'pageview', getURL());
+    _gauges.push(['track']);
   }
 
   // Set the main image
