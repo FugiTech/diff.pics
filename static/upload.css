@@ -233,7 +233,7 @@ img[src=""] {
     /*height: 40px;*/
     width: 900px;
     border: 2px solid #444;
-    border-radius: 100px;
+    border-radius: 40px;
 }
 
 #rename > h3 {
@@ -251,31 +251,58 @@ img[src=""] {
     text-align: left;
 }
 
-#rename input {
+#rename .inputs div {
+    display: inline-block;
     vertical-align: top;
     width: 356px;
     margin: 10px;
-    padding: 0;
-    border: 0;
-    text-align: center;
-    font-size: 16px;
-    line-height: 20px;
-    color: #CCC;
-    background: #444;
 }
-
-#rename input:hover {
-    background: #666;
-}
-
-.cols-3 #rename input {
+.cols-3 #rename .inputs div {
     width: 230px;
 }
-.cols-many #rename input {
+.cols-many #rename .inputs div {
     width: 168px;
 }
 
-#swap {
+#rename .inputs div input {
+    vertical-align: top;
+    padding: 0;
+    border: 0;
+    width: calc(100% - 24px);
+    font-size: 16px;
+    line-height: 20px;
+    text-align: center;
+    color: #CCC;
+    background: #444;
+}
+#rename .inputs div input:hover {
+    background: #666;
+}
+
+#rename .inputs div span {
+    vertical-align: top;
+    display: inline-block;
+    height: 18px;
+    padding: 0 6px 0 4px;
+    font-size: 12px;
+    color: #444;
+    border: 1px solid #444;
+    border-radius: 0 10px 10px 0;
+}
+#rename .inputs div span:hover {
+    color: #666;
+    border: 1px solid #666;
+    cursor: grab;
+    cursor: -webkit-grab;
+    cursor: -moz-grab;
+}
+#rename .inputs div span:active {
+    cursor: grabbing;
+    cursor: -webkit-grabbing;
+    cursor: -moz-grabbing;
+}
+
+#add_col {
     margin: 20px auto;
     height: 30px;
     width: 900px;
@@ -286,14 +313,9 @@ img[src=""] {
     font-size: 24px;
 }
 
-#swap:hover {
+#add_col:hover {
     background: #666;
     cursor: pointer;
-}
-
-.cols-3 #swap,
-.cols-many #swap {
-    display: none;
 }
 
 #submit {

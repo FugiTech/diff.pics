@@ -27,7 +27,7 @@ $(function () {
   $("#title").attr("placeholder", ich.comparison_title().text());
   $("#add").html(ich.add_comparison());
   $("#rename > h3").html(ich.rename_comparison());
-  $("#swap").html(ich.swap_columns());
+  $("#add_col").html(ich.add_column());
   $("#submit").html(ich.submit_comparison());
   $("#hide").html(ich.accept());
   $("#footer").html(ich.footer({
@@ -37,10 +37,12 @@ $(function () {
   $("#magic").html(ich.magic_prompt());
   $("#wizard > h1").html(ich.wizard_title());
 
+  $("#rename .inputs").append('<div><input type="text"><span class="handle"><i class="fa fa-arrows"></i></span></div>');
+  $("#rename .inputs").append('<div><input type="text"><span class="handle"><i class="fa fa-arrows"></i></span></div>');
+
   $("#comparisons").sortable({
     axis: "y",
     containment: "parent",
-    cursor: "row-resize",
     handle: ".number",
     update: function (event, ui) {
       var row = $(ui.item[0]);
@@ -51,6 +53,39 @@ $(function () {
       recalculateComparisons();
     }
   });
+
+  $("#rename .inputs").sortable({
+    containment: "parent",
+    handle: ".handle",
+    start: function (event, ui) {
+      ui.item.oldIndex = ui.item.index();
+    },
+    update: function (event, ui) {
+      var o = ui.item.oldIndex,
+          n = ui.item.index(),
+          s = Math.min(o, n),
+          e = Math.max(o, n);
+
+      var imgs = _.pluck(IMAGES, s);
+      var moveImages = function (i) {
+        _.each(IMAGES, function (comparison) {
+          // Use setTimeout to avoid updating comparisons until we're done with their values
+          setTimeout(load.bind(null, comparison[i].container, comparison[i+1]), 0);
+        });
+      };
+      
+      for (var i = s; i < e; i++) {
+        COLUMNS[i] = $("#rename .inputs div:nth-child("+(i+1)+") input").val();
+        moveImages(i);
+      }
+      COLUMNS[e] = $("#rename .inputs div:nth-child("+(e+1)+") input").val();
+      _.each(IMAGES, function (comparison, i) {
+        // Same as before
+        setTimeout(load.bind(null, comparison[e].container, imgs[i]), 0);
+      });
+    }
+  });
+
   createComparison();
 });
 
@@ -73,7 +108,7 @@ $(document).on("input", ".image > input", function () {
   console.log(file.goodName);
 });
 $(document).on("input", "#rename input", function () {
-  recalculateColumn($(this).index());
+  recalculateColumn($(this).parent().index());
 });
 
 // Image Uploader
@@ -81,7 +116,7 @@ function getFileFor(container) {
   var comparison = container.parent().parent().index();
   var column = container.index();
   return IMAGES[comparison][column];
-};
+}
 function load(container, file) {
   var comparison = container.parent().parent().index();
   var column = container.index();
@@ -102,7 +137,6 @@ function load(container, file) {
 
   sha1(file).then(function (hash) {
     file.sha1 = hash;
-    SHAS[hash] = false;
     checkSha(hash);
   });
 }
@@ -144,24 +178,24 @@ function createComparison() {
   if (num >= 10) row.find(".number").addClass("large-number");
   $("#comparisons").append(row);
   $("#comparisons").sortable("refresh");
-};
+}
 function recalculateComparisons() {
   $(".comparison").each(function (index) {
-    $(this).find(".number").text(index + 1).toggleClass("large-number", index >= 10);
+    $(this).find(".number").text(index + 1).toggleClass("large-number", index + 1 >= 10);
   });
   $("#comparisons").sortable("refresh");
-};
+}
 function recalculateColumn(column) {
-  COLUMNS[column] = $("#rename input:nth-child("+(column + 1)+")").val();
+  COLUMNS[column] = $("#rename .inputs div:nth-child("+(column + 1)+") input").val();
   $(".image:nth-child("+(column + 1)+")").each(function (comparison) {
     $(this).children('input').toggle(IMAGES[comparison][column] && !COLUMNS[column]);
   });
-};
+}
 function removeComparison(index) {
   IMAGES.splice(index, 1);
   $("#comparisons > div:nth-child("+(index + 1)+")").remove();
   recalculateComparisons();
-};
+}
 
 $(document).on("click", "#add", function () {
   createComparison();
@@ -171,23 +205,18 @@ $(document).on("click", ".remove", function () {
   removeComparison($(this).parent().index());
   return false;
 });
-$(document).on("click", "#swap", function () {
-  // First, swap the titles
-  var t = COLUMNS[1];
-  COLUMNS[1] = COLUMNS[0];
-  COLUMNS[0] = t;
-  $("#rename input:nth-child(1)").val(COLUMNS[0]);
-  $("#rename input:nth-child(2)").val(COLUMNS[1]);
-
-  // Now swap all the files
-  _.each(IMAGES, function (comparison) {
-    var a = comparison[0],
-        b = comparison[1],
-        ac = a.container,
-        bc = b.container;
-    load(ac, b);
-    load(bc, a);
-  });
+$(document).on("click", "#add_col", function () {
+  var getClass = function () { return "cols-"+(COLUMNS.length>3?"many":COLUMNS.length); };
+  $("html").removeClass(getClass());
+  COLUMNS.push("");
+  $("html").addClass(getClass());
+  $(".comparison .images").append(ich.image({
+    drop: ich.upload_drop().html(),
+    or: ich.upload_or().html(),
+    browse: ich.upload_browse().html()
+  }));
+  $("#rename .inputs").append('<div><input type="text"><span class="handle"><i class="fa fa-arrows"></i></span></div>');
+  $("#rename .inputs").sortable("refresh");
   return false;
 });
 
@@ -210,6 +239,7 @@ RUSHA.onmessage = function (e) {
 };
 
 function checkSha(hash) {
+  if (SHAS[hash]) return;
   return RSVP.resolve($.get("/check/"+hash)).then(function (r) {
     _.merge(SHAS, JSON.parse(r));
   });
@@ -363,7 +393,7 @@ function magic(files) {
   var start = Date.now();
   $("#wizard").show();
 
-  var comparisons = {}
+  var comparisons = {};
   for (var i = 0; i < files.length; i++)
     comparisons[i] = [];
 
@@ -396,18 +426,18 @@ function magic(files) {
       var a = Math.min(_a, _b),
           b = Math.max(_a, _b);
       return comparisons[a][b];
-    }
+    };
 
     var done = {};
     var together = [];
     _.each(_.range(files.length), function (a) {
       if (a in done) return;
 
-      var d = 0, t = [a];
+      var d = 0, t = [a], td, b;
       while (t.length < COLUMNS.length) {
         do {
-          var td = _.min(comparisons[a]);
-          var b = _.indexOf(comparisons[a], td);
+          td = _.min(comparisons[a]);
+          b = _.indexOf(comparisons[a], td);
           comparisons[a][b] = 100;
         } while (b in done);
 
@@ -447,7 +477,7 @@ function magic(files) {
       return v;
     };
     var titles = _.map(words, function (w, i) {
-      var r = _.words(column_title(w, "#rename input:nth-child("+(i+1)+")"));
+      var r = _.words(column_title(w, "#rename .inputs div:nth-child("+(i+1)+") input"));
       recalculateColumn(i);
       return r;
     });
@@ -457,7 +487,7 @@ function magic(files) {
   }).catch(function (e) {
     $("#wizard > h1").html(ich.error({error_message: e.message}));
   });
-};
+}
 
 // The experiment lab - Fun shit goes here
 var BETA_INITIALIZED = false;
@@ -474,13 +504,12 @@ function initializeBeta() {
     return audio;
   });
   $("#beta").append(ich.beta_contents({
-    add_column: ich.add_column().html()
   }));
-};
+}
 function refreshBeta() {
-  $("#beta audio").each(function () { BETA_ENABLED ? this.play() : this.pause(); });
+  $("#beta audio").each(function () { return BETA_ENABLED ? this.play() : this.pause(); });
   $("html").toggleClass("beta-enabled", BETA_ENABLED);
-};
+}
 
 // Show/Hide the experiment lab
 $(document).on("keydown", function (e) {
@@ -500,17 +529,4 @@ $(document).on("click", "#beta div", function () {
   var i = Math.floor(Math.random() * BETA_CLICK_AUDIO.length);
   var audio = BETA_CLICK_AUDIO[i];
   audio.play();
-});
-
-$(document).on("click", "#add_col", function () {
-  var getClass = function () { return "cols-"+(COLUMNS.length>3?"many":COLUMNS.length); };
-  $("html").removeClass(getClass());
-  COLUMNS.push("");
-  $("html").addClass(getClass());
-  $(".comparison .images").append(ich.image({
-    drop: ich.upload_drop().html(),
-    or: ich.upload_or().html(),
-    browse: ich.upload_browse().html()
-  }));
-  $("#rename .inputs").append($("<input>").attr("type", "text"));
 });
