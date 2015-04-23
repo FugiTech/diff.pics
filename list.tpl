@@ -3,28 +3,22 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Diff.Pics - {{title}}</title>
+    <title>Diff.Pics - List</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,700">
-    <link rel="stylesheet" href="/static/view.css">
-    <script>COMPARISONS = {{!comparisons}}</script>
+    <link rel="stylesheet" href="/static/list.css">
   </head>
   <body>
-    <h1>{{title}}</h1>
-
-    <div id="selector"></div>
-    <div id="subselector"></div>
-
-    <div id="comparison">
-      <h2 id="filename">
-        <span id="main"></span>
-        <span id="hover"></span>
-      </h2>
-      <img src="">
-    </div>
-
-    <div id="preload"><h1></h1></div>
+    <h1>{{amount}} comparisons with {{total_views}} views</h1>
+      % for comparison in comparisons:
+      <p>
+        <a href="/{{comparison["key"]}}">
+          <span>{{comparison["title"] or "No Title"}}</span>
+          <em>{{"{:,d}".format(int(comparison["views"] or 0))}}</em>
+        </a>
+      </p>
+      % end
 
     <div id="footer"></div>
 
@@ -34,7 +28,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/URI.js/1.11.2/URI.min.js"></script>
     <script src="/static/rsvp.js"></script>
     <script src="/static/translations.js"></script>
-    <script src="/static/view.js"></script>
+    <script>$(function () { $("#footer").html(ich.footer({ "github": '<a href="https://github.com/Fugiman/diff.pics/issues">Github</a>', "twitter": '<a href="https://twitter.com/fugiman">Twitter</a>' })); });</script>
 
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
@@ -53,11 +47,3 @@
     </script>
   </body>
 </html>
-
-<script id="subselect" type="text/html">
-  <div class="subselect">
-    <span class="number">{{"{{number}}"}}</span>
-    &nbsp;
-    <span class="name">{{"{{name}}"}}</span>
-  </div>
-</script>

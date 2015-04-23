@@ -12,10 +12,13 @@ from boto.dynamodb2.table import Table
 from boto.s3.key import Key
 
 from bottle import app as app_factory
-from bottle import (TEMPLATE_PATH, error, get, post, redirect, request,
+from bottle import (TEMPLATE_PATH, abort, error, get, post, redirect, request,
                     response, run, static_file, view)
 
 # Initialize app
+with open("config.json", "r") as f:
+    CONFIG = json.load(f)
+
 app = app_factory()
 TEMPLATE_PATH.append(".")
 
@@ -41,6 +44,18 @@ def static(filename):
 @get("/")
 def index():
     return static_file("index.html", root=os.getcwd())
+
+@get("/list")
+@view("list")
+def list_comparisons():
+    if request.params.key not in CONFIG["list_keys"]:
+        abort(401)
+    comps = sorted(list(comparisons.scan()), key=lambda c: int(c["views"] or 0), reverse=True)
+    return {
+        "comparisons": comps,
+        "amount": "{:,d}".format(len(comps)),
+        "total_views": "{:,d}".format(sum([int(c["views"] or 0) for c in comps]))
+    }
 
 @get("/check/<hashes>")
 def check(hashes):
