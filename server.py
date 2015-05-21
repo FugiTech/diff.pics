@@ -135,7 +135,10 @@ def comparison(key, index=None):
     imgs = {i["sha1"]:{"hash": i["sha1"]+i.get("ext", ""), "name": i["filename"]} for i in results}
     data = [[imgs[h] for h in l] for l in c["comparisons"]]
 
-    index = int(index)
+    try:
+        index = int(index)
+    except ValueError:
+        index = 0
     if index <= 0:
         index = 1
     elif index > len(data):
