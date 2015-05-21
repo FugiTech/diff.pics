@@ -134,14 +134,14 @@ def comparison(key, index=None):
     results = images.batch_get(keys=[{"sha1": h} for h in hashes], consistent=True)
     imgs = {i["sha1"]:{"hash": i["sha1"]+i.get("ext", ""), "name": i["filename"]} for i in results}
     data = [[imgs[h] for h in l] for l in c["comparisons"]]
-    if index < 0:
+    if not index or index < 0:
         index = 0
     elif index >= len(data):
         index = len(data) - 1
 
     return {
         "title": c["title"] or "Untitled",
-        "image": "http://cdn.diff.pics/{}".format(data[index][0]),
+        "image": "http://cdn.diff.pics/{}".format(data[index][0]["hash"]),
         "url": "http://diff.pics/{}/{:d}".format(key, index),
         "comparisons": json.dumps(data)
     }
