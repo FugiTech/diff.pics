@@ -6,6 +6,10 @@
     <title>Diff.Pics - {{title}}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="twitter:card" content="photo">
+    <meta name="twitter:title" content="{{title}}">
+    <meta name="twitter:image" content="{{image}}">
+    <meta name="twitter:url" content="{{url}}">
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,700">
     <link rel="stylesheet" href="/static/view.css">
     <script>COMPARISONS = {{!comparisons}}</script>
