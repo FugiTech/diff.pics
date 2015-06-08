@@ -60,6 +60,12 @@ def list_comparisons():
         "total_views": "{:,d}".format(sum([int(c["views"] or 0) for c in comps]))
     }
 
+@get("/_error")
+def raise_error():
+    if request.params.key not in CONFIG["list_keys"]:
+        abort(401)
+    raise Exception("This is a test exception for sentry")
+
 @get("/check/<hashes>")
 def check(hashes):
     hashes = set(hashes.upper().split(","))
