@@ -10,6 +10,7 @@ import boto
 from boto.dynamodb2.exceptions import ItemNotFound
 from boto.dynamodb2.table import Table
 from boto.s3.key import Key
+from raven.contrib.bottle import Sentry
 
 from bottle import app as app_factory
 from bottle import (TEMPLATE_PATH, abort, error, get, post, redirect, request,
@@ -20,6 +21,8 @@ with open("config.json", "r") as f:
     CONFIG = json.load(f)
 
 app = app_factory()
+app.catchall = False
+app = Sentry(app, CONFIG["sentry_dsn"], logging=True)
 TEMPLATE_PATH.append(".")
 
 # Initialize AWS
