@@ -12,10 +12,31 @@ from boto.dynamodb2.exceptions import ItemNotFound
 from boto.dynamodb2.table import Table
 from boto.s3.key import Key
 from raven.contrib.bottle import Sentry
+from raven.utils import stacks
+from raven.utils.compat import _urlparse
 
 from bottle import app as app_factory
 from bottle import (TEMPLATE_PATH, abort, error, get, post, redirect, request,
                     response, run, static_file, view)
+
+
+# Monkey patch to fix what sentry sees as the URL
+def uwsgi_url_fix(route):
+    def _uwsgi_url_fix(*args, **kwargs):
+        url = _urlparse.urlsplit(request.url)
+        path = url.path.split("/")
+        if url.hostname == path[0]:
+            path.pop(0)
+        url = list(url)
+        url[2] = "/".join(path)
+        request.url = _urlparse.urlunsplit(url)
+        return route(*args, **kwargs)
+    return _uwsgi_url_fix
+
+# Monkey patch to get better error names in sentry
+def _label_from_frame(frame):
+    return frame.get('context_line', '').strip()
+stacks.label_from_frame = _label_from_frame
 
 # Initialize app
 with open("config.json", "r") as f:
@@ -23,12 +44,14 @@ with open("config.json", "r") as f:
 
 app = app_factory()
 app.catchall = False
+app.install(uwsgi_url_fix)
 TEMPLATE_PATH.append(".")
 
 sentry_client = raven.Client(dsn=CONFIG["sentry_dsn"],
     include_paths=[__name__.split('.', 1)[0]],
     release=raven.fetch_git_sha(os.path.dirname(__file__)))
-app = Sentry(app, sentry_client, logging=True)
+app = Sentry(app, sentry_client)
+
 # Initialize AWS
 comparisons = Table("diff.pics-comparisons")
 images = Table("diff.pics-images")
