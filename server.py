@@ -139,6 +139,8 @@ def comparison(key, index=None):
         index = int(index)
     except ValueError:
         index = 0
+    except TypeError:
+        index = 0
     if index <= 0:
         index = 1
     elif index > len(data):
