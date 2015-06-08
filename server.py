@@ -7,6 +7,7 @@ import random
 import string
 
 import boto
+import raven
 from boto.dynamodb2.exceptions import ItemNotFound
 from boto.dynamodb2.table import Table
 from boto.s3.key import Key
@@ -22,9 +23,12 @@ with open("config.json", "r") as f:
 
 app = app_factory()
 app.catchall = False
-app = Sentry(app, CONFIG["sentry_dsn"], logging=True)
 TEMPLATE_PATH.append(".")
 
+sentry_client = raven.Client(dsn=CONFIG["sentry_dsn"],
+    include_paths=[__name__.split('.', 1)[0]],
+    release=raven.fetch_git_sha(os.path.dirname(__file__)))
+app = Sentry(app, sentry_client, logging=True)
 # Initialize AWS
 comparisons = Table("diff.pics-comparisons")
 images = Table("diff.pics-images")
