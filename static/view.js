@@ -3,9 +3,17 @@ ID = "";
 INDEX = 0;
 PIC = 0;
 ALPHABET = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+READY = RSVP.defer();
 
 RSVP.on("error", function (e) {
   console.error(e);
+});
+
+window.download = _.once(function () {
+  READY.promise.then(function (f) {
+    f();
+  });
+  return false;
 });
 
 // Ensure ID and INDEX match current URL - always
@@ -18,9 +26,9 @@ function setIDandINDEX() {
   INDEX = Math.min(Math.max(i, 1), COMPARISONS.length);
   // Now decrement it by one
   INDEX--;
-};
+}
 function getURL() {
-  return "/" + ID + "/" + (INDEX+1)
+  return "/" + ID + "/" + (INDEX+1);
 }
 
 // ...on start up
@@ -37,6 +45,7 @@ window.addEventListener('popstate', function () {
 
 // Now that UI is ready, let's start loading stuff!
 $(function () {
+  $("#download").html(ich.download());
   $("#preload").find("h1").html(ich.loading());
   $("#footer").html(ich.footer({
     "github": '<a href="https://github.com/Fugiman/diff.pics/issues">Github</a>',
@@ -54,10 +63,23 @@ $(function () {
     $("#preload").css("opacity", 0);
     setComparison(INDEX);
 
+    var loading = [];
     for (var i = 0; i < COMPARISONS.length; i++) {
       if (i === INDEX) continue;
-      loadComparison(i);
+      loading.push(loadComparison(i));
     }
+    return RSVP.all(loading);
+  }).then(function () {
+    // Enable download all button
+    var zip = new JSZip();
+    _.each(COMPARISONS, function (comparison) {
+      _.each(comparison, function (image) {
+        zip.file(image.hash.slice(0,6)+' '+image.name, image.buffer, {binary: true});
+      });
+    });
+    var title = document.getElementsByTagName("h1")[0].innerText;
+    var content = zip.generate({type:"blob"});
+    READY.resolve(function () { saveAs(content, title+".zip"); });
   });
 });
 
@@ -91,17 +113,25 @@ function loadComparison(index) {
   var loading = [];
   _.each(COMPARISONS[index], function (image) {
     var d = RSVP.defer();
-    var img = $("<img>");
-    img.on("load", function () { d.resolve(); });
-    img.on("error", function () { d.reject(); });
-    img.attr("src", CDN + image.hash);
-    $("#preload").append(img);
+    var req = new XMLHttpRequest();
+    req.open("GET", CDN + image.hash, true);
+    req.responseType = "arraybuffer";
+    req.onload = function (e) {
+      image.buffer = req.response;
+      image.blob = new Blob([image.buffer]);
+      image.url = URL.createObjectURL(image.blob);
+      d.resolve();
+    };
+    req.onerror = function () {
+      d.reject();
+    };
+    req.send();
     loading.push(d.promise);
   });
   return RSVP.all(loading).then(function () {
     var selectors = $("#selector img");
     if (selectors.length) {
-      selectors[index].src = CDN + COMPARISONS[index][0].hash;
+      selectors[index].src = COMPARISONS[index][0].url;
     }
   });
 }
@@ -119,12 +149,12 @@ function setComparison(i, p) {
 
   // Set the main image
   $("#main").text(c[PIC].name);
-  $("#comparison img").attr("src", CDN + c[PIC].hash);
+  $("#comparison img").attr("src", c[PIC].url);
 
   // Set the hover image to the other image if we only have 2, otherwise don't change on hover
   var hover_index = c.length === 2 ? 1 - PIC : PIC;
   $("#hover").text(c[hover_index].name);
-  $("#comparison").css("background-image", "url(" + CDN + c[hover_index].hash + ")");
+  $("#comparison").css("background-image", "url(" + c[hover_index].url + ")");
 
   // If we have more than 2 images, allow swapping between them with buttons/number keys
   $("#subselector").empty();

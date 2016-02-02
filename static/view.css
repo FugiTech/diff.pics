@@ -11,6 +11,21 @@ img[src=""] {
     display: none;
 }
 
+h1 {
+    margin-bottom: 0.1em;
+}
+
+#download {
+    display: block;
+    margin-bottom: 0.5em;
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+#download:hover {
+    color: #444;
+}
+
 #selector img {
     height: 60px;
     margin: 10px;

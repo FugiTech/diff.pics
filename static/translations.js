@@ -54,6 +54,7 @@ var urlParams;
     "uploading_submit": "Submitting comparison",
 
     "accept": "OK",
+    "download": "DOWNLOAD",
     "loading": "Loading...",
     "footer": "Submit feedback on {{{github}}} or {{{twitter}}}",
     "error": "ERROR: {{error_message}}",

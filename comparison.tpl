@@ -16,6 +16,7 @@
   </head>
   <body>
     <h1>{{title}}</h1>
+    <a id="download" href="#" onclick="return window.download()"></a>
 
     <div id="selector"></div>
     <div id="subselector"></div>
@@ -36,6 +37,7 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/ICanHaz.js/0.10.3/ICanHaz.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/URI.js/1.11.2/URI.min.js"></script>
+    <script src="/static/jszip.min.js"></script>
     <script src="/static/rsvp.js"></script>
     <script src="/static/translations.js"></script>
     <script src="/static/view.js"></script>
