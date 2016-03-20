@@ -130,7 +130,7 @@ function load(container, file) {
 
   file.container = container;
   file.url = file.url || window.URL.createObjectURL(file);
-  file.goodName = file.name;
+  file.goodName = file.name || "UNKNOWN";
 
   container.find("img").attr("src", file.url);
   container.children('input').val(nameAndExt(file.goodName)[0]).toggle(!COLUMNS[column]);
@@ -140,19 +140,34 @@ function load(container, file) {
     checkSha(hash);
   });
 }
-$(document).on("drop", ".image", function (e) {
-  var target = $(this);
-  var data = e.originalEvent.dataTransfer;
+function lookup(target, data) {
+  var file = _.find(data.items, "kind", "file");
+  file = (data.files.length && data.files[0]) || (file && file.getAsFile());
+  var url = data.getData("URL") || data.getData("text");
   target.removeClass("hover");
-  if (data.files.length) {
-    load(target, data.files[0]);
-  } else {
-    var file = _.chain(IMAGES).flatten().find("url", data.getData("URL")).value();
+  if (file) {
+    load(target, file);
+  } else if(url.startsWith('http')) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', '/download?url='+encodeURIComponent(url), true);
+    xhr.responseType = 'blob';
+    xhr.onload = function (e) {
+      if (this.status === 200) {
+        this.response.name = url;
+        load(target, this.response);
+      }
+    };
+    xhr.send();
+  } else if(url.startsWith('blob')) {
+    file = _.chain(IMAGES).flatten().find("url", url).value();
     var replaced = getFileFor(target);
     var source = file.container;
     load(target, file);
     load(source, replaced);
   }
+}
+$(document).on("drop", ".image", function (e) {
+  lookup($(this), e.originalEvent.dataTransfer);
   return false;
 });
 $(document).on("change", ".image > .button > input", function () {
@@ -160,9 +175,26 @@ $(document).on("change", ".image > .button > input", function () {
   return false;
 });
 
+// Very silly on-paste handling
+$(document).on("paste", function (e) {
+  if (e.target.tagName === "INPUT")
+    return true;
+
+  // Find first empty container, or create one if all full
+  var index = _.chain(IMAGES).flatten().findIndex(function (x) { return !x; }).value();
+  if (index < 0) {
+    index = _.flatten(IMAGES).length;
+    createComparison();
+  }
+  var target = $($(".image").get(index));
+  var data = (e.originalEvent.clipboardData || window.clipboardData);
+  lookup(target, data);
+  return false;
+});
+
 // Add & Remove comparisons
 function createComparison() {
-  IMAGES.push([]);
+  IMAGES.push(_.times(COLUMNS.length, _.noop));
   var num = $("#comparisons > div").length + 1;
   var row = ich.comparison({
     number: num,

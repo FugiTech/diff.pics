@@ -8,6 +8,7 @@ import string
 
 import boto
 import raven
+import requests
 from boto.dynamodb2.exceptions import ItemNotFound
 from boto.dynamodb2.table import Table
 from boto.s3.key import Key
@@ -16,8 +17,8 @@ from raven.utils import stacks
 from raven.utils.compat import _urlparse
 
 from bottle import app as app_factory
-from bottle import (TEMPLATE_PATH, abort, error, get, post, redirect, request,
-                    response, run, static_file, view)
+from bottle import (TEMPLATE_PATH, Response, abort, error, get, post, redirect,
+                    request, response, run, static_file, view)
 
 
 # Monkey patch to fix what sentry sees as the URL
@@ -99,6 +100,16 @@ def check(hashes):
     results = images.batch_get(keys=[{"sha1": h} for h in hashes], consistent=True)
     exists = set([r["sha1"] for r in results])
     return json.dumps({h:h in exists for h in hashes})
+
+@get("/download")
+def download():
+    url = request.params.get("url")
+    if not url.startswith("http://") and not url.startswith("https://"):
+        abort(400, "Invalid URL")
+    resp = requests.get(url, stream=True)
+    if not resp.headers['content-type'].startswith("image/"):
+        abort(400, "Requested url was not an image")
+    return Response(resp.iter_content(1024), headers=dict(resp.headers))
 
 @post("/upload")
 def upload():
