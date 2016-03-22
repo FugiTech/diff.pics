@@ -56,7 +56,7 @@ app = Sentry(app, sentry_client)
 # Initialize AWS
 comparisons = Table("diff.pics-comparisons")
 images = Table("diff.pics-images")
-image_data = boto.connect_s3().get_bucket("diff.pics")
+image_data = boto.s3.connect_to_region('us-east-1', calling_format=boto.s3.connection.OrdinaryCallingFormat()).get_bucket("diff.pics")
 
 # Utility functions
 def increment_item(item, key, value):
