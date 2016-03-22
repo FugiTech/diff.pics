@@ -12,6 +12,7 @@ import requests
 from boto.dynamodb2.exceptions import ItemNotFound
 from boto.dynamodb2.table import Table
 from boto.s3.key import Key
+from boto.s3.connection import OrdinaryCallingFormat
 from raven.contrib.bottle import Sentry
 from raven.utils import stacks
 from raven.utils.compat import _urlparse
@@ -56,7 +57,7 @@ app = Sentry(app, sentry_client)
 # Initialize AWS
 comparisons = Table("diff.pics-comparisons")
 images = Table("diff.pics-images")
-image_data = boto.s3.connect_to_region('us-east-1', calling_format=boto.s3.connection.OrdinaryCallingFormat()).get_bucket("diff.pics")
+image_data = boto.s3.connect_to_region('us-east-1', calling_format=OrdinaryCallingFormat()).get_bucket("diff.pics")
 
 # Utility functions
 def increment_item(item, key, value):
