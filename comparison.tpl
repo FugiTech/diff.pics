@@ -16,7 +16,11 @@
   </head>
   <body>
     <h1>{{title}}</h1>
-    <a id="download" href="#" onclick="return window.download()"></a>
+    <div id="subtitle">
+      <a id="download" href="#" onclick="return window.download()"></a>
+      -
+      <span>{{views}} views</span>
+    </div>
 
     <div id="selector"></div>
     <div id="subselector"></div>

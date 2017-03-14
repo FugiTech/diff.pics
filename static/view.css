@@ -15,12 +15,15 @@ h1 {
     margin-bottom: 0.1em;
 }
 
-#download {
+#subtitle {
     display: block;
     margin-bottom: 0.5em;
     color: #333;
-    text-decoration: none;
     font-weight: bold;
+}
+#download {
+    color: #333;
+    text-decoration: none;
 }
 #download:hover {
     color: #444;

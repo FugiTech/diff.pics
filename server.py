@@ -11,8 +11,8 @@ import raven
 import requests
 from boto.dynamodb2.exceptions import ItemNotFound
 from boto.dynamodb2.table import Table
-from boto.s3.key import Key
 from boto.s3.connection import OrdinaryCallingFormat
+from boto.s3.key import Key
 from raven.contrib.bottle import Sentry
 from raven.utils import stacks
 from raven.utils.compat import _urlparse
@@ -198,7 +198,8 @@ def comparison(key, index=None):
         "title": c["title"] or "Untitled",
         "image": "http://cdn.diff.pics/{}".format(data[index-1][0]["hash"]),
         "url": "http://diff.pics/{}/{:d}".format(key, index),
-        "comparisons": json.dumps(data)
+        "comparisons": json.dumps(data),
+        "views": c["views"] or 0
     }
 
 @error(404)
