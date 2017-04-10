@@ -80,4 +80,33 @@ var urlParams;
     "footer": "{{{github}}}のや{{{twitter}}}のフィードバックを送信",
     "error": "誤差: {{error_message}}",
   },
+  "fr": {
+    "comparison_title": "Titre de la comparaison",
+    "add_comparison": "Ajouter une comparaison",
+    "rename_comparison": "Renomer plusieurs fichiers",
+    "swap_columns": "Intervertir les colonnes",
+    "submit_comparison": "Envoyer la comparaison",
+    "remove_comparison": "\nS\nU\nP\nP\nR\nI\nM\nE\nR",
+
+    "add_column": "Ajouter une colonne",
+
+    "upload_drop": "Déposez l'image ici",
+    "upload_or": "ou",
+    "upload_browse": "Parcourir les fichiers...",
+
+    "magic_prompt": "Vous ne pouvez pas ajouter plus d'un fichier à la fois avec l'interface manuelle.\nCependant, nous pouvons automatiquement choisir quelles images ajouter.\nFaites glissez vos fichiers n'importe où sur la page pour essayer !",
+    "wizard_title": "Calculateur de différence d'images automatique",
+
+    "uploading_search": "Recherche des images à ajouter",
+    "uploading_image": "Envoi de {{filename}}",
+    "uploading_submit": "Envoi de la comparaison",
+
+    "accept": "OK",
+    "download": "TELECHARGER",
+    "loading": "Chargement...",
+    "footer": "Rapporter un problème sur {{{github}}} or {{{twitter}}}",
+    "error": "ERREUR : {{error_message}}",
+
+    "duplicate_file_error": "Vous ne pouvez pas envoyer la même image deux fois",
+  },
 });
