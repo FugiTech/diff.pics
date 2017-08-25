@@ -196,8 +196,8 @@ def comparison(key, index=None):
 
     return {
         "title": c["title"] or "Untitled",
-        "image": "http://cdn.diff.pics/{}".format(data[index-1][0]["hash"]),
-        "url": "http://diff.pics/{}/{:d}".format(key, index),
+        "image": "https://cdn.diff.pics/{}".format(data[index-1][0]["hash"]),
+        "url": "https://diff.pics/{}/{:d}".format(key, index),
         "comparisons": json.dumps(data),
         "views": c["views"] or 0
     }

@@ -10,7 +10,7 @@
     <meta name="twitter:title" content="{{title}}">
     <meta name="twitter:image" content="{{image}}">
     <meta name="twitter:url" content="{{url}}">
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,700">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,300,700">
     <link rel="stylesheet" href="/static/view.css">
     <script>COMPARISONS = {{!comparisons}}</script>
   </head>
@@ -37,7 +37,7 @@
 
     <div id="footer"></div>
 
-    <script src="http://code.jquery.com/jquery-2.1.3.min.js"></script>
+    <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/ICanHaz.js/0.10.3/ICanHaz.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/URI.js/1.11.2/URI.min.js"></script>
