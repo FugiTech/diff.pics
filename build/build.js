@@ -203,7 +203,7 @@ co(function* () {
   // spinner.stop()
 
   let end = new Date()
-  console.log(chalk.cyan('Build complete! `${end - start}`ms\n'))
+  console.log(chalk.cyan(`Build complete! ${end - start}ms\n`))
 }).then(null, (err) => {
   console.log(chalk.red('Build failed with errors.\n'))
   console.log(err)
