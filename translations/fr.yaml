@@ -1,0 +1,12 @@
+ComparisonTitle: Titre de la comparaison
+MassRename: Renomer plusieurs fichiers
+AddRow: Ajouter une comparaison
+AddColumn: Ajouter une colonne
+RemoveRow: SUPPRIMER
+RemoveColumn: Supprimer une colonne
+Submit: Envoyer la comparaison
+Upload:
+  Drop: Déposez l'image ici
+  Or: ou
+  Browse: Parcourir les fichiers...
+Feedback: Rapporter un problème sur {github} or {twitter}

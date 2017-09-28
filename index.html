@@ -1,110 +1,20 @@
 <!DOCTYPE html>
-<html>
+<html lang="{{LOCALE}}">
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Diff.Pics</title>
-    <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Diff.pics</title>
     <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,300,700">
-    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="/static/upload.css">
+
+    <% for (var chunk of webpack.chunks) {
+        for (var file of chunk.files) {
+          if (file.match(/\.(js|css)$/)) { %>
+    <link rel="<%= chunk.initial?'preload':'prefetch' %>" href="<%= htmlWebpackPlugin.files.publicPath + file %>" as="<%= file.match(/\.css$/)?'style':'script' %>"><% }}} %>
+
+    <script>LOCALE = '{{LOCALE}}'</script>
   </head>
   <body>
-    <br>
-    <input id="title" type="text">
-    <div id="comparisons"></div>
-    <div id="add"></div>
-    <div id="rename">
-      <h3></h3>
-      <div class="inputs"></div>
-    </div>
-    <div id="add_col"></div>
-    <div id="beta"></div>
-    <div id="submit"></div>
-
-    <div id="upload">
-      <h1></h1>
-      <img src="">
-      <progress></progress>
-      <button id="hide"></button>
-    </div>
-
-    <div id="footer"></div>
-
-    <div id="magic"></div>
-    <div id="wizard">
-      <h1></h1>
-      <progress></progress>
-      <div></div>
-    </div>
-
-    <script src="//code.jquery.com/jquery-2.1.3.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.2/jquery-ui.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/ICanHaz.js/0.10.3/ICanHaz.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/3.5.0/lodash.min.js"></script>
-    <script src="/static/rsvp.js"></script>
-    <script src="/static/mass-image-compare.js"></script>
-    <script src="/static/translations.js"></script>
-    <script src="/static/upload.js"></script>
-
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-      ga('create', 'UA-59995668-1', 'auto');
-      ga('send', 'pageview');
-    </script>
-    <script>
-      (function(w,d,s,i,u,a,k,n,e,p){w[n]=w[n]||[];
-      e=d.createElement(s);e.async=1;e.id=i;e.setAttribute(a,k);e.src=u;
-      m=d.getElementsByTagName(s)[0];m.parentNode.insertBefore(e,m);})
-      (window,document,'script','gauges-tracker','//secure.gaug.es/track.js','data-site-id','5528e2fcde2e263309000e22','_gauges');
-    </script>
+    <div id="app"></div>
   </body>
 </html>
-
-<script id="comparison" type="text/html">
-  <div class="comparison">
-    <div class="number">{{number}}</div>
-    <div class="images"></div>
-    <div class="remove">{{{remove}}}</div>
-  </div>
-</script>
-
-<script id="image" type="text/html">
-  <div class="image">
-    <img src="">
-    <strong>{{{drop}}</strong>
-    <br>
-    <em>{{{or}}}</em>
-    <br>
-    <div class="button">
-      <button type="button">{{{browse}}}</button>
-      <input type="file" accept="image/*">
-    </div>
-    <input class="imageName" type="text">
-  </div>
-</script>
-
-<script id="beta_contents" type="text/html">
-  <a>X</a>
-  <h3>
-    <i class="fa fa-exclamation-triangle"></i>
-    <i class="fa fa-exclamation-triangle"></i>
-    <i class="fa fa-exclamation-triangle"></i>
-    &nbsp;
-    <i class="fa fa-flask"></i>
-    &nbsp;
-    EXPERIMENTAL FEATURE LAB
-    &nbsp;
-    <i class="fa fa-flask"></i>
-    &nbsp;
-    <i class="fa fa-exclamation-triangle"></i>
-    <i class="fa fa-exclamation-triangle"></i>
-    <i class="fa fa-exclamation-triangle"></i>
-  </h3>
-  <audio src="//cdn.diff.pics/_/party.mp3" autoplay loop controls></audio>
-</script>
