@@ -90,6 +90,7 @@ func create_comparison(r *http.Request) (interface{}, error) {
 
 	// Step 3: Wait for images to finish processing if they're not done yet (they should be)
 	// TODO
+	time.Sleep(10 * time.Second)
 
 	// Step 4: Download all the images (to make the ZIP file)
 	eg, ctx := errgroup.WithContext(context.Background())

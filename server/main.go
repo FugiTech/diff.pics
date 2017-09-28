@@ -4,10 +4,13 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
+	"net"
 	"net/http"
 	_ "net/http/pprof"
 	"os"
+	"os/signal"
 	"regexp"
+	"syscall"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -28,17 +31,47 @@ var uploader = s3manager.NewUploader(awsSession)
 var hashRe = regexp.MustCompile(`^[0-9A-F]{40}$`)
 
 func main() {
-	var err error
+	http.HandleFunc("/check_images", h(check_images))
+	http.HandleFunc("/create_comparison", h(create_comparison))
+
+	var (
+		l   net.Listener
+		err error
+	)
+	if os.Getenv("SOCKPATH") != "" {
+		l, err = net.Listen("unix", os.Getenv("SOCKPATH"))
+	} else {
+		l, err = net.Listen("tcp", "127.0.0.1:9999")
+	}
+	if err != nil {
+		log.Print("net.Listen:", err)
+		return
+	}
+	defer l.Close()
+
 	db, err = sql.Open("mysql", os.Getenv("MYSQL")+"diff.pics?parseTime=true")
 	if err != nil {
 		log.Print("sql.Open:", err)
 		return
 	}
 
-	go func() { log.Println("fullBuild:", fullBuild()) }()
-	http.HandleFunc("/check_images", h(check_images))
-	http.HandleFunc("/create_comparison", h(create_comparison))
-	log.Println(http.ListenAndServe("127.0.0.1:9999", nil))
+	log.Println("fullBuild:", fullBuild())
+
+	shutdown := make(chan struct{})
+	go func() {
+		if err := http.Serve(l, nil); err != nil {
+			log.Println("http.Serve:", err)
+		}
+		shutdown <- struct{}{}
+	}()
+
+	// Wait for either a signal or our server to stop
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGTERM)
+	select {
+	case <-c:
+	case <-shutdown:
+	}
 }
 
 func h(fn func(*http.Request) (interface{}, error)) func(http.ResponseWriter, *http.Request) {

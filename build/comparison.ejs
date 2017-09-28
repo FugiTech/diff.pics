@@ -8,7 +8,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="<%= Title %>">
   <meta name="twitter:description" content="A diff.pics comparison">
-  <meta name="twitter:image" content="https://diff.pics<%= Images[Selected][0].Path %>">
+  <meta name="twitter:image" content="https://static.diff.pics<%= Images[Selected][0].Path %>">
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,300,700">
   <style>
     *, *::before, *::after {
@@ -109,7 +109,7 @@
 <% if (Images.length > 1) { -%>
   <div class="selector">
 <% Images.forEach((row, idx) => { -%>
-    <a href="/<%= Key %>/<%= idx + 1 %>"><img src="<%= row[0].Thumb %>"></a>
+    <a href="/<%= Key %>/<%= idx + 1 %>"><img src="https://static.diff.pics<%= row[0].Thumb %>"></a>
 <% }) -%>
   </div>
 <% } -%>
@@ -126,7 +126,7 @@
 <% Images[Selected].forEach((img, idx) => { -%>
   <div class="comparison comp-<%= idx + 1 %>">
     <h2><%= img.Name %></h2>
-    <img src="<%= img.Path %>" />
+    <img src="https://static.diff.pics<%= img.Path %>" />
   </div>
 <% }) -%>
 <% if (Images[Selected].length <= 2) { -%>

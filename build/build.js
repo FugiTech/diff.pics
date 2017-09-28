@@ -180,27 +180,27 @@ co(function* () {
   })
   spinner.stop()
 
-  spinner = ora('copying images...')
-  spinner.start()
-  yield pool(50, function* () {
-    let f = (_path) => {
-      mkdirp.sync(config.build.assetsRoot+path.dirname(_path))
-      return p(download, 'https://diff.pics${_path}', `${config.build.assetsRoot}${_path}`).then(null, () => {
-        return p(s3.getObject.bind(s3), { Bucket: 'diff.pics', Key: _path.substr(1) }).then((data) => {
-          return p(fs.writeFile, `${config.build.assetsRoot}${_path}`, data)
-        })
-      })
-    }
-    for (let k in data.images) {
-      let img = data.images[k]
-      yield f(img.Path)
-      yield f(img.Thumb)
-    }
-    for (let i = 0; i < data.comparisons.length; i++) {
-      yield f(data.comparisons[i].Zip)
-    }
-  })
-  spinner.stop()
+  // spinner = ora('copying images...')
+  // spinner.start()
+  // yield pool(50, function* () {
+  //   let f = (_path) => {
+  //     mkdirp.sync(config.build.assetsRoot+path.dirname(_path))
+  //     return p(download, 'https://diff.pics${_path}', `${config.build.assetsRoot}${_path}`).then(null, () => {
+  //       return p(s3.getObject.bind(s3), { Bucket: 'diff.pics', Key: _path.substr(1) }).then((data) => {
+  //         return p(fs.writeFile, `${config.build.assetsRoot}${_path}`, data)
+  //       })
+  //     })
+  //   }
+  //   for (let k in data.images) {
+  //     let img = data.images[k]
+  //     yield f(img.Path)
+  //     yield f(img.Thumb)
+  //   }
+  //   for (let i = 0; i < data.comparisons.length; i++) {
+  //     yield f(data.comparisons[i].Zip)
+  //   }
+  // })
+  // spinner.stop()
 
   let end = new Date()
   console.log(chalk.cyan('Build complete! `${end - start}`ms\n'))
