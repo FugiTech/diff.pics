@@ -4,9 +4,22 @@ AddRow: Ajouter une comparaison
 AddColumn: Ajouter une colonne
 RemoveRow: SUPPRIMER
 RemoveColumn: Supprimer une colonne
+Preview: Preview Comparison
 Submit: Envoyer la comparaison
 Upload:
   Drop: Déposez l'image ici
   Or: ou
   Browse: Parcourir les fichiers...
 Feedback: Rapporter un problème sur {github} or {twitter}
+Magic:
+  Dragging more than one file at a time doesn't work with the manual UI.
+  However, we can try to figure out what images to compare automatically.
+  Drop your files anywhere on the page to try it out!
+Hint: 'Hint: You can drag & drop multiple images at once!'
+Error:
+  Title: ERROR
+  OK: OK
+  Missing: Some image slots are missing images. Please fill all slots or remove rows or columns as needed before submitting.
+Download: DOWNLOAD
+Views: '{views} views'
+DownloadPreview: Downloading is disabled in preview mode
