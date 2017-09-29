@@ -55,8 +55,6 @@ func main() {
 		return
 	}
 
-	log.Println("fullBuild:", fullBuild())
-
 	shutdown := make(chan struct{})
 	go func() {
 		if err := http.Serve(l, nil); err != nil {

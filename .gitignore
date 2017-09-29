@@ -5,7 +5,4 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-server/build.go
-server/template.go
-server/translations.go
 .env

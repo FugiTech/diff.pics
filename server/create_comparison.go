@@ -185,7 +185,11 @@ func create_comparison(r *http.Request) (interface{}, error) {
 	}
 
 	// Step 10: Run a full build
-	// TODO
+	for {
+		if err = fullBuild(); err == nil {
+			break
+		}
+	}
 
 	// Step 11: return the url to go to
 	return map[string]string{"URL": fmt.Sprintf("/%s/1", key)}, nil
