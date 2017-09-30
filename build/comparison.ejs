@@ -102,14 +102,14 @@
   <div class="feedback"><%- Translations.Feedback.replace('{github}', '<a href="https://github.com/Fugiman/diff.pics/issues">Github</a>').replace('{twitter}', '<a href="https://twitter.com/fugiman">Twitter</a>') %></div>
   <h1><%= Title %></h1>
   <div class="subtitle">
-    <a href="https://download.diff.pics<%= Zip %>" download="<%= Title %>.zip"><%= Translations.Download %></a>
+    <a href="<%= Zip %>" download="<%= Title %>.zip"><%= Translations.Download %></a>
     -
     <%= Translations.Views.replace('{views}', Views) %>
   </div>
 <% if (Images.length > 1) { -%>
   <div class="selector">
 <% Images.forEach((row, idx) => { -%>
-    <a href="/<%= Key %>/<%= idx + 1 %>"><img src="https://static.diff.pics<%= row[0].Thumb %>"></a>
+    <a href="/<%= Key %>/<%= idx + 1 %>"><img src="<%= row[0].Thumb %>"></a>
 <% }) -%>
   </div>
 <% } -%>
@@ -126,7 +126,7 @@
 <% Images[Selected].forEach((img, idx) => { -%>
   <div class="comparison comp-<%= idx + 1 %>">
     <h2><%= img.Name %></h2>
-    <img src="https://static.diff.pics<%= img.Path %>" />
+    <img src="<%= img.Path %>" />
   </div>
 <% }) -%>
 <% if (Images[Selected].length <= 2) { -%>

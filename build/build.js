@@ -133,7 +133,11 @@ co(function* () {
   }
 
   // Make the _redirects file
-  let redirectsData = '/:comparison/ /:comparison/1 301\n'
+  let redirectsData = ''
+  redirectsData += '/zips/* https://download.diff.pics/zips/:splat 200\n'
+  redirectsData += '/images/* https://static.diff.pics/images/:splat 200\n'
+  redirectsData += '/thumbs/* https://static.diff.pics/thumbs/:splat 200\n'
+  redirectsData += '/:comparison/ /:comparison/1 301\n'
   Object.keys(translations).forEach((locale) => {
     mkdirp.sync(config.build.assetsRoot+`/${locale}/`)
     redirectsData += `/ /${locale}/ 200 Language=${locale}\n`
