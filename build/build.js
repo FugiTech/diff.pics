@@ -134,15 +134,21 @@ co(function* () {
 
   // Make the _redirects file
   let redirectsData = ''
-  redirectsData += '/zips/* https://download.diff.pics/zips/:splat 200\n'
+  // Act like everything is on one subdomain
+  redirectsData += '/zips/* https://d1ixq8i208rmoa.cloudfront.net/zips/:splat 200\n'
   redirectsData += '/images/* https://static.diff.pics/images/:splat 200\n'
   redirectsData += '/thumbs/* https://static.diff.pics/thumbs/:splat 200\n'
+  // Make /:comparison work
   redirectsData += '/:comparison/ /:comparison/1 301\n'
+  // Redirect translated languages to their own folders
   Object.keys(translations).forEach((locale) => {
     mkdirp.sync(config.build.assetsRoot+`/${locale}/`)
     redirectsData += `/ /${locale}/ 200 Language=${locale}\n`
     redirectsData += `/:comparison/:index /${locale}/:comparison/:index 200 Language=${locale}\n`
   })
+  // Default to english
+  redirectsData += `/ /en/ 200\n`
+  redirectsData += `/:comparison/:index /en/:comparison/:index 200\n`
   fs.writeFileSync(config.build.assetsRoot+`/_redirects`, redirectsData)
 
   // Now, delete index.html and put it in the localized directories
