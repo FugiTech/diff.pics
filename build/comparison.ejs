@@ -87,7 +87,7 @@
 
 <% if (Images[Selected].length > 2) { -%>
 <% Images[Selected].forEach((img, idx) => { -%>
-  #comp-{{ inc $idx }}:checked ~ .comp-{{ inc $idx }} {
+  #comp-<%= idx + 1 %>:checked ~ .comp-<%= idx + 1 %> {
     display: inline-block;
   }
 <% }) -%>
@@ -116,7 +116,7 @@
 
 <% if (Images[Selected].length > 2) { -%>
 <% Images[Selected].forEach((img, idx) => { -%>
-  <label for="comp-<%= idx + 1 %>"><span><%= label(idx) %>: <%= img.Name %></span></label><input type="radio" name="img" id="comp-<%= idx + 1 %>"<% if (idx === 0) { %> checked<% } %>>
+  <label for="comp-<%= idx + 1 %>"><span><%= label(idx + 1) %>: <%= img.Name %></span></label><input type="radio" name="img" id="comp-<%= idx + 1 %>"<% if (idx === 0) { %> checked<% } %>>
 <% }) -%>
 <% } -%>
 
