@@ -20,7 +20,7 @@ import (
 
 var db *sql.DB
 
-var awsAccessKey = os.Getenv("AWS_ACCESS_KEY")
+var awsAccessKey = os.Getenv("AWS_ACCESS_KEY_ID")
 var awsSecretAccessKey = os.Getenv("AWS_SECRET_ACCESS_KEY")
 var awsRegion = "us-east-1"
 
@@ -33,6 +33,7 @@ var hashRe = regexp.MustCompile(`^[0-9A-F]{40}$`)
 func main() {
 	http.HandleFunc("/check_images", h(check_images))
 	http.HandleFunc("/create_comparison", h(create_comparison))
+	http.HandleFunc("/ping", ping)
 
 	var (
 		l   net.Listener

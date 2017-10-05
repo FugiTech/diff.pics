@@ -12,6 +12,7 @@ import (
 	"math"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -21,6 +22,8 @@ import (
 	"github.com/pkg/errors"
 	"golang.org/x/sync/errgroup"
 )
+
+var NetlifyHookURL = os.Getenv("NETLIFY_DEPLOY_HOOK")
 
 func create_comparison(r *http.Request) (interface{}, error) {
 	body, err := ioutil.ReadAll(r.Body)
@@ -89,8 +92,7 @@ func create_comparison(r *http.Request) (interface{}, error) {
 	}
 
 	// Step 3: Wait for images to finish processing if they're not done yet (they should be)
-	// TODO
-	time.Sleep(10 * time.Second)
+	time.Sleep(10 * time.Second) // TODO: use webhooks for this detection, should speed things up by 10 seconds and make it more reliable
 
 	// Step 4: Download all the images (to make the ZIP file)
 	eg, ctx := errgroup.WithContext(context.Background())
@@ -186,8 +188,61 @@ func create_comparison(r *http.Request) (interface{}, error) {
 
 	// Step 10: Run a full build
 	for {
+		if _, err := http.Post(NetlifyHookURL, "", nil); err == nil {
+			break
+		}
+	}
+	var deployID string
+	for {
+		time.Sleep(2 * time.Second)
+		resp, err := http.Get("https://api.netlify.com/api/v1/sites/diff.pics/deploys?access_token=" + AccessToken)
+		if err != nil {
+			continue
+		}
+		defer resp.Body.Close()
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			continue
+		}
+		deployResp := []struct {
+			DeployID string `json:"id"`
+		}{}
+		err = json.Unmarshal(body, &deployResp)
+		if err != nil {
+			continue
+		}
+
+		deployID = deployResp[0].DeployID
+		break
+	}
+	for {
 		if err = fullBuild(); err == nil {
 			break
+		}
+	}
+
+	digest := &struct {
+		State        string `json:"state"`
+		ErrorMessage string `json:"error_message"`
+	}{}
+	for digest.State != "prepared" && digest.State != "ready" {
+		// Check for errors in preproccessing
+		if digest.State == "error" {
+			return nil, fmt.Errorf("Deploy failed: %s -- Your comparison will eventually be at https://diff.pics/%s/1", digest.ErrorMessage, key)
+		}
+		time.Sleep(2 * time.Second)
+		resp, err := http.Get("https://api.netlify.com/api/v1/deploys/" + deployID + "?access_token=" + AccessToken)
+		if err != nil {
+			continue
+		}
+		defer resp.Body.Close()
+		body, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			continue
+		}
+		err = json.Unmarshal(body, &digest)
+		if err != nil {
+			continue
 		}
 	}
 
