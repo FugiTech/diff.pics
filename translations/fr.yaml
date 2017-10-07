@@ -1,25 +1,25 @@
 ComparisonTitle: Titre de la comparaison
-MassRename: Renomer plusieurs fichiers
+MassRename: Renommer plusieurs fichiers
 AddRow: Ajouter une comparaison
 AddColumn: Ajouter une colonne
 RemoveRow: SUPPRIMER
 RemoveColumn: Supprimer une colonne
-Preview: Preview Comparison
+Preview: Prévisualisation de la comparison
 Submit: Envoyer la comparaison
-Upload:
+Upload: Envoyer
   Drop: Déposez l'image ici
-  Or: ou
+  Or: Ou
   Browse: Parcourir les fichiers...
-Feedback: Rapporter un problème sur {github} or {twitter}
+Feedback: Rapporter un problème sur {github} ou {twitter}
 Magic:
-  Dragging more than one file at a time doesn't work with the manual UI.
-  However, we can try to figure out what images to compare automatically.
-  Drop your files anywhere on the page to try it out!
-Hint: 'Hint: You can drag & drop multiple images at once!'
+  Faire glisser plus d'un ficher à la fois ne fonctionne pas avec l'interface manuelle.
+  Cependant, nous pouvons essayer de trouver quelles images comparer automatiquement.
+  Faites glisser vos fichiers n'importe où sur la page pour essayer !
+Hint: 'Astuce: Vous pouvez glisser-déposer pluieurs images en même temps !'
 Error:
-  Title: ERROR
+  Title: ERREUR
   OK: OK
-  Missing: Some image slots are missing images. Please fill all slots or remove rows or columns as needed before submitting.
-Download: DOWNLOAD
-Views: '{views} views'
-DownloadPreview: Downloading is disabled in preview mode
+  Missing: Plusieurs images sont manquantes. Veuillez remplir tous les emplacements ou supprimez autant de lignes ou colonnes que nécessaire avant d'envoyer.
+Download: TELECHARGER
+Views: '{views} vues'
+DownloadPreview: Le téléchargement est désactivé en mode prévisualisation
