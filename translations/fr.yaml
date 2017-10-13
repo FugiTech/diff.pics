@@ -6,8 +6,8 @@ RemoveRow: SUPPRIMER
 RemoveColumn: Supprimer une colonne
 Preview: Prévisualisation de la comparison
 Submit: Envoyer la comparaison
-Upload: Envoyer
-  Drop: Déposez l'image ici
+Upload:
+  Drop: "Déposez l'image ici"
   Or: Ou
   Browse: Parcourir les fichiers...
 Feedback: Rapporter un problème sur {github} ou {twitter}
