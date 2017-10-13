@@ -180,7 +180,7 @@ export default {
       }).then((response) => {
         return response.json()
       }).then((data) => {
-        alert(data.URL)
+        window.location = data.URL
       }).then(null, (e) => {
         console.error(e)
         this.error = e.message
