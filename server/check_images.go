@@ -70,7 +70,7 @@ func check_images(r *http.Request) (interface{}, error) {
 
 		resp[p.key] = imageUpload{
 			URL:        "https://s3.amazonaws.com/upload.diff.pics/",
-			Key:        h,
+			Key:        p.key,
 			Policy:     b,
 			Signature:  sign(b, p.date[:8]),
 			Credential: p.cred,
