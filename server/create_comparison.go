@@ -63,6 +63,9 @@ func create_comparison(r *http.Request) (interface{}, error) {
 		return nil, fmt.Errorf("No images to compare")
 	}
 
+	// Step 3: Wait for images to finish processing if they're not done yet (they should be)
+	time.Sleep(10 * time.Second) // TODO: use webhooks for this detection, should speed things up by 10 seconds and make it more reliable
+
 	// Step 2: Look up all the images we're comparing
 	rows, err := db.Query(fmt.Sprintf("SELECT `id`, `path`, `thumb`, `format` FROM `images` WHERE `path` IN (?%s)", strings.Repeat(",?", len(paths)-1)), paths...)
 	if err != nil {
@@ -91,14 +94,14 @@ func create_comparison(r *http.Request) (interface{}, error) {
 		return nil, fmt.Errorf("Invalid SQL: %v", err)
 	}
 
-	// Step 3: Wait for images to finish processing if they're not done yet (they should be)
-	time.Sleep(10 * time.Second) // TODO: use webhooks for this detection, should speed things up by 10 seconds and make it more reliable
-
 	// Step 4: Download all the images (to make the ZIP file)
 	eg, ctx := errgroup.WithContext(context.Background())
 	for _, row := range params.Images {
 		for _, img := range row {
 			img := img
+			if img.ID == "" {
+				return nil, fmt.Errorf("Couldn't lookup image %q", img.Sha)
+			}
 			eg.Go(func() error {
 				buf := aws.NewWriteAtBuffer([]byte{})
 				_, err := downloader.DownloadWithContext(ctx, buf, &s3.GetObjectInput{
