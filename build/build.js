@@ -144,12 +144,11 @@ co(function* () {
   Object.keys(translations).forEach((locale) => {
     mkdirp.sync(config.build.assetsRoot+`/${locale}/`)
     redirectsData += `/ /${locale}/ 200 Language=${locale}\n`
-    redirectsData += `/:comparison/:index /${locale}/:comparison/:index 200 Language=${locale}\n`
+    redirectsData += `/:comparison/:index https://api.diff.pics/comparison/${locale}/:comparison/:index 200 Language=${locale}\n`
   })
   // Default to english
   redirectsData += `/ /en/ 200\n`
-  redirectsData += `/:comparison/:index /en/:comparison/:index 200\n`
-  redirectsData += `/:locale/:comparison/:index https://api.diff.pics/comparison/:locale/:comparison/:index 200\n`
+  redirectsData += `/:comparison/:index https://api.diff.pics/comparison/en/:comparison/:index 200\n`
   fs.writeFileSync(config.build.assetsRoot+`/_redirects`, redirectsData)
 
   // Now, delete index.html and put it in the localized directories
@@ -160,36 +159,36 @@ co(function* () {
   })
 
   // Add comparisons & images
-  spinner = ora('fetching comparisons...')
-  spinner.start()
-  let data = yield getAllComparisons()
-  spinner.stop()
-
-  spinner = ora('writing comparisons...')
-  spinner.start()
-  yield pool(50, function* () {
-    let locales = Object.keys(translations)
-    for (let c = 0; c < data.comparisons.length; c++) {
-      let comp = data.comparisons[c]
-      for (let l = 0; l < locales.length; l++) {
-        let locale = locales[l]
-        mkdirp.sync(config.build.assetsRoot+`/${locale}/${comp.Key}/`)
-        for (var i = 0; i < comp.Images.length; i++) {
-          yield p(fs.writeFile, config.build.assetsRoot+`/${locale}/${comp.Key}/${i+1}.html`, template({
-            Key: comp.Key,
-            Title: comp.Title,
-            Zip: comp.Zip,
-            Views: comp.Views,
-            Images: comp.Images,
-            Translations: translations[locale],
-            Selected: i,
-            label: (n) => { if (n < 10) { return ''+n } return String.fromCharCode(55 + n) }
-          }))
-        }
-      }
-    }
-  })
-  spinner.stop()
+  // spinner = ora('fetching comparisons...')
+  // spinner.start()
+  // let data = yield getAllComparisons()
+  // spinner.stop()
+  //
+  // spinner = ora('writing comparisons...')
+  // spinner.start()
+  // yield pool(50, function* () {
+  //   let locales = Object.keys(translations)
+  //   for (let c = 0; c < data.comparisons.length; c++) {
+  //     let comp = data.comparisons[c]
+  //     for (let l = 0; l < locales.length; l++) {
+  //       let locale = locales[l]
+  //       mkdirp.sync(config.build.assetsRoot+`/${locale}/${comp.Key}/`)
+  //       for (var i = 0; i < comp.Images.length; i++) {
+  //         yield p(fs.writeFile, config.build.assetsRoot+`/${locale}/${comp.Key}/${i+1}.html`, template({
+  //           Key: comp.Key,
+  //           Title: comp.Title,
+  //           Zip: comp.Zip,
+  //           Views: comp.Views,
+  //           Images: comp.Images,
+  //           Translations: translations[locale],
+  //           Selected: i,
+  //           label: (n) => { if (n < 10) { return ''+n } return String.fromCharCode(55 + n) }
+  //         }))
+  //       }
+  //     }
+  //   }
+  // })
+  // spinner.stop()
 
   // spinner = ora('copying images...')
   // spinner.start()
@@ -230,16 +229,16 @@ co(function* () {
   let fileCount = countDir('dist')
   let magicNumber = 60000
   let dropped = 0
-  if (fileCount >= magicNumber) {
-    let folders = fs.readdirSync('dist/fr').sort()
-    while (fileCount >= magicNumber) {
-      let f = folders.pop()
-      let c = countDir('dist/fr/'+f)
-      dropped += c
-      fileCount -= c
-      yield p(rm, 'dist/fr/'+f)
-    }
-  }
+  // if (fileCount >= magicNumber) {
+  //   let folders = fs.readdirSync('dist/fr').sort()
+  //   while (fileCount >= magicNumber) {
+  //     let f = folders.pop()
+  //     let c = countDir('dist/fr/'+f)
+  //     dropped += c
+  //     fileCount -= c
+  //     yield p(rm, 'dist/fr/'+f)
+  //   }
+  // }
 
   let end = new Date()
   console.log(chalk.cyan(`Build complete! ${end - start}ms`))

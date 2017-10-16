@@ -75,7 +75,6 @@ func comparison(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Header().Set("cache-control", "public, max-age=31557600")
 	w.Write(buf.Bytes())
 }
 

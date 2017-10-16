@@ -190,10 +190,7 @@ func create_comparison(r *http.Request) (interface{}, error) {
 	}
 
 	// Step 10: Run a full build, but don't block on it as the API & S3 will shim in the page while it deploys
-	go func() {
-		http.Post(NetlifyHookURL, "", nil)
-		fullBuild()
-	}()
+	go fullBuild()
 
 	// Step 11: return the url to go to
 	return map[string]string{"URL": fmt.Sprintf("/%s/1", key)}, nil
