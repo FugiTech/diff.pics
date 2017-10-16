@@ -212,7 +212,7 @@ var comparisonTemplate = template.Must(template.New("comparisonTemplate").Funcs(
 {{ if gt (len .Images) 1 }}
   <div class="selector">
 {{ range $idx, $row := .Images }}
-    <a href="/{{ $.Key }}/{{ incr $idx }}"><img src="/thumbs/{{ (index $row 0).Thumb }}"></a>
+    <a href="/{{ $.Key }}/{{ incr $idx }}"><img src="/thumbs/{{ (index $row 0).Thumb }}" onerror="this.onerror=null;this.src='https://download.diff.pics'+this.src"></a>
 {{ end }}
   </div>
 {{ end }}
@@ -229,7 +229,7 @@ var comparisonTemplate = template.Must(template.New("comparisonTemplate").Funcs(
 {{ range $idx, $img := index .Images .Selected }}
   <div class="comparison comp-{{ incr $idx }}">
     <h2>{{ $img.Name }}</h2>
-    <img src="/images/{{ $img.Path }}" />
+    <img src="/images/{{ $img.Path }}" onerror="this.onerror=null;this.src='https://download.diff.pics'+this.src" />
   </div>
 {{ end }}
 {{ if le (len (index .Images .Selected)) 2 }}

@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"context"
-	"crypto/sha1"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -62,15 +61,9 @@ func fullBuild() (rerr error) {
 		}
 	}()
 
-	redirectFile := []byte("/* https://download.diff.pics/:splat 200")
-	redirectSha := fmt.Sprintf("%x", sha1.Sum(redirectFile))
-
 	// Track files & hashes for deployment
 	hashes := map[string]string{}
 	rhashes := map[string][]string{}
-
-	hashes["_redirects"] = redirectSha
-	rhashes[redirectSha] = append(rhashes[redirectSha], "_redirects")
 
 	// Add images from database
 	rows, err := db.Query("SELECT `path`, `thumb` FROM `images`")
@@ -171,21 +164,16 @@ func fullBuild() (rerr error) {
 				var err error
 				url := fmt.Sprintf("https://api.netlify.com/api/v1/deploys/%s/files/%s", digest.DeployID, file)
 
-				var uploadData []byte
-				if file == "_redirects" {
-					uploadData = redirectFile
-				} else {
-					buf := aws.NewWriteAtBuffer([]byte{})
-					_, err = downloader.DownloadWithContext(ctx, buf, &s3.GetObjectInput{
-						Bucket: aws.String("diff.pics"),
-						Key:    aws.String(file),
-					})
-					if err != nil {
-						log.Println("Could not download from s3:", file, err)
-						return fmt.Errorf("Could not download from s3: %s: %v", file, err)
-					}
-					uploadData = buf.Bytes()
+				buf := aws.NewWriteAtBuffer([]byte{})
+				_, err = downloader.DownloadWithContext(ctx, buf, &s3.GetObjectInput{
+					Bucket: aws.String("diff.pics"),
+					Key:    aws.String(file),
+				})
+				if err != nil {
+					log.Println("Could not download from s3:", file, err)
+					return fmt.Errorf("Could not download from s3: %s: %v", file, err)
 				}
+				uploadData := buf.Bytes()
 
 				for i := 0; i < MaxRetries; i++ {
 					req, _ := http.NewRequest("PUT", url, bytes.NewReader(uploadData))
