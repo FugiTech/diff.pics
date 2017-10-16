@@ -228,7 +228,7 @@ co(function* () {
   }
 
   let fileCount = countDir('dist')
-  let magicNumber = 64000
+  let magicNumber = 60000
   let dropped = 0
   if (fileCount >= magicNumber) {
     let folders = fs.readdirSync('dist/fr').sort()
