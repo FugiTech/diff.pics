@@ -213,8 +213,38 @@ co(function* () {
   // })
   // spinner.stop()
 
+  let countDir = (path) => {
+    let c = 0
+    fs.readdirSync(path).map((fname) => {
+      let f = path + '/' + fname
+      if (fs.lstatSync(f).isDirectory()) {
+        c += countDir(f)
+      } else {
+        c++
+      }
+      return f
+    })
+    return c
+  }
+
+  let fileCount = countDir('dist')
+  let magicNumber = 64000
+  let dropped = 0
+  if (fileCount >= magicNumber) {
+    let folders = fs.readdirSync('dist/fr').sort()
+    while (fileCount >= magicNumber) {
+      let f = folders.pop()
+      let c = countDir('dist/fr/'+f)
+      dropped += c
+      fileCount -= c
+      yield p(rm, 'dist/fr/'+f)
+    }
+  }
+
   let end = new Date()
-  console.log(chalk.cyan(`Build complete! ${end - start}ms\n`))
+  console.log(chalk.cyan(`Build complete! ${end - start}ms`))
+  console.log(chalk.cyan(`Generated ${fileCount} files`))
+  console.log(chalk.cyan(`Dropped ${dropped} files`))
 }).then(null, (err) => {
   console.log(chalk.red('Build failed with errors.\n'))
   console.log(err)
