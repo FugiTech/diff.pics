@@ -112,7 +112,7 @@ var comparisonTemplate = template.Must(template.New("comparisonTemplate").Funcs(
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ .Title }}">
   <meta name="twitter:description" content="A diff.pics comparison">
-  <meta name="twitter:image" content="https://static.diff.pics/{{ (index .Images .Selected 0).Path }}">
+  <meta name="twitter:image" content="https://static.diff.pics/images/{{ (index .Images .Selected 0).Path }}">
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,300,700">
   <style>
     *, *::before, *::after {
@@ -206,14 +206,14 @@ var comparisonTemplate = template.Must(template.New("comparisonTemplate").Funcs(
   <div class="feedback">{{ hydrate . "Feedback" }}</div>
   <h1>{{ .Title }}</h1>
   <div class="subtitle">
-    <a href="/{{ .Zip }}" download="{{ .Title }}.zip">{{ .Translations.Download }}</a>
+    <a href="/zips/{{ .Zip }}" download="{{ .Title }}.zip">{{ .Translations.Download }}</a>
     -
     {{ hydrate . "Views" }}
   </div>
 {{ if gt (len .Images) 1 }}
   <div class="selector">
 {{ range $idx, $row := .Images }}
-    <a href="/{{ $.Key }}/{{ incr $idx }}"><img src="/{{ (index $row 0).Thumb }}"></a>
+    <a href="/{{ $.Key }}/{{ incr $idx }}"><img src="/thumbs/{{ (index $row 0).Thumb }}"></a>
 {{ end }}
   </div>
 {{ end }}
@@ -230,7 +230,7 @@ var comparisonTemplate = template.Must(template.New("comparisonTemplate").Funcs(
 {{ range $idx, $img := index .Images .Selected }}
   <div class="comparison comp-{{ incr $idx }}">
     <h2>{{ $img.Name }}</h2>
-    <img src="/{{ $img.Path }}" />
+    <img src="/images/{{ $img.Path }}" />
   </div>
 {{ end }}
 {{ if le (len (index .Images .Selected)) 2 }}
