@@ -189,65 +189,11 @@ func create_comparison(r *http.Request) (interface{}, error) {
 		return nil, fmt.Errorf("Failed to insert comparison images: %v", err)
 	}
 
-	// Step 10: Run a full build
-	for {
-		if _, err := http.Post(NetlifyHookURL, "", nil); err == nil {
-			break
-		}
-	}
-	var deployID string
-	for {
-		time.Sleep(2 * time.Second)
-		resp, err := http.Get("https://api.netlify.com/api/v1/sites/diff.pics/deploys?access_token=" + AccessToken)
-		if err != nil {
-			continue
-		}
-		defer resp.Body.Close()
-		body, err = ioutil.ReadAll(resp.Body)
-		if err != nil {
-			continue
-		}
-		deployResp := []struct {
-			DeployID string `json:"id"`
-		}{}
-		err = json.Unmarshal(body, &deployResp)
-		if err != nil {
-			continue
-		}
-
-		deployID = deployResp[0].DeployID
-		break
-	}
-	for {
-		if err = fullBuild(); err == nil {
-			break
-		}
-	}
-
-	digest := &struct {
-		State        string `json:"state"`
-		ErrorMessage string `json:"error_message"`
-	}{}
-	for digest.State != "prepared" && digest.State != "ready" {
-		// Check for errors in preproccessing
-		if digest.State == "error" {
-			return nil, fmt.Errorf("Deploy failed: %s -- Your comparison will eventually be at https://diff.pics/%s/1", digest.ErrorMessage, key)
-		}
-		time.Sleep(2 * time.Second)
-		resp, err := http.Get("https://api.netlify.com/api/v1/deploys/" + deployID + "?access_token=" + AccessToken)
-		if err != nil {
-			continue
-		}
-		defer resp.Body.Close()
-		body, err = ioutil.ReadAll(resp.Body)
-		if err != nil {
-			continue
-		}
-		err = json.Unmarshal(body, &digest)
-		if err != nil {
-			continue
-		}
-	}
+	// Step 10: Run a full build, but don't block on it as the API & S3 will shim in the page while it deploys
+	go func() {
+		http.Post(NetlifyHookURL, "", nil)
+		fullBuild()
+	}()
 
 	// Step 11: return the url to go to
 	return map[string]string{"URL": fmt.Sprintf("/%s/1", key)}, nil

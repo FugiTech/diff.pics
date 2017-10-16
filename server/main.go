@@ -34,6 +34,7 @@ func main() {
 	http.HandleFunc("/check_images", h(check_images))
 	http.HandleFunc("/create_comparison", h(create_comparison))
 	http.HandleFunc("/ping", ping)
+	http.HandleFunc("/comparison/", comparison)
 
 	var (
 		l   net.Listener

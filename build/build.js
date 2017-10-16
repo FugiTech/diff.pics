@@ -135,7 +135,7 @@ co(function* () {
   // Make the _redirects file
   let redirectsData = ''
   // Act like everything is on one subdomain
-  redirectsData += '/zips/* https://d1ixq8i208rmoa.cloudfront.net/zips/:splat 200\n'
+  redirectsData += '/zips/* https://download.diff.pics/zips/:splat 200\n'
   redirectsData += '/images/* https://static.diff.pics/images/:splat 200\n'
   redirectsData += '/thumbs/* https://static.diff.pics/thumbs/:splat 200\n'
   // Make /:comparison work
@@ -149,6 +149,7 @@ co(function* () {
   // Default to english
   redirectsData += `/ /en/ 200\n`
   redirectsData += `/:comparison/:index /en/:comparison/:index 200\n`
+  redirectsData += `/:locale/:comparison/:index https://api.diff.pics/comparison/:locale/:comparison/:index 200\n`
   fs.writeFileSync(config.build.assetsRoot+`/_redirects`, redirectsData)
 
   // Now, delete index.html and put it in the localized directories
