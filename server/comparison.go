@@ -221,6 +221,7 @@ var comparisonTemplate = template.Must(template.New("comparisonTemplate").Funcs(
 {{ range $idx, $img := index .Images .Selected }}
   <label for="comp-{{ incr $idx }}"><span>{{ label (incr $idx) }}: {{ $img.Name }}</span></label><input type="radio" name="img" id="comp-{{ incr $idx }}"{{ if eq $idx 0 }} checked{{ end }}>
 {{ end }}
+<br>
 {{ end }}
 
 {{ if le (len (index .Images .Selected)) 2 }}
