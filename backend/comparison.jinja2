@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Diff.pics - {{ title }}</title>
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ title }}">
+  <meta name="twitter:description" content="A diff.pics comparison">
+  <meta name="twitter:image" content="{{ selected_images[0].url }}">
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Open+Sans:400,300,700">
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Open Sans", sans-serif;
+      color: white;
+      background: black;
+      text-align: center;
+      margin: 0;
+    }
+    .feedback {
+      font-size: 0.8em;
+      text-align: right;
+      color: #666;
+      padding-right: 5px;
+    }
+    .feedback a {
+      color: #999;
+    }
+    h1 {
+      margin: 0.1em;
+    }
+    .subtitle, .subtitle a {
+      color: #333;
+      font-weight: bold;
+      text-decoration: none;
+    }
+    .subtitle a:hover {
+      color: #444;
+    }
+    .selector img {
+      height: 60px;
+      padding: 2px;
+      margin: 0 5px;
+    }
+    .selector img:hover {
+      border: 2px solid #999;
+      padding: 0;
+      cursor: pointer;
+    }
+    span {
+      display: inline-block;
+      border: 2px solid #444;
+      color: #444;
+      padding: 3px 8px;
+      margin: 5px;
+      font-weight: bold;
+    }
+    span:hover {
+      border-color: #666;
+      color: #666;
+      cursor: pointer;
+    }
+    input {
+      display: none;
+    }
+    .comparison {
+      display: none;
+      text-align: left;
+      margin-top: 20px;
+    }
+    h2 {
+      margin: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+{% if selected_images|length > 2 %}
+{% for idx in range(selected_images|length) %}
+  #comp-{{ idx + 1 }}:checked ~ .comp-{{ idx + 1 }} {
+    display: inline-block;
+  }
+{% endfor %}
+{% else %}
+  .comp-1 { display: inline-block; }
+  .comparisons:hover .comp-1 { display: none; }
+  .comparisons:hover .comp-2 { display: inline-block; }
+{% endif %}
+  </style>
+</head>
+<body>
+  <div class="feedback">Submit feedback on <a href="https://github.com/Fugiman/diff.pics/issues">Github</a> or <a href="https://twitter.com/fugiman">Twitter</a></div>
+  <h1>{{ title }}</h1>
+  <div class="subtitle">
+    <a href="/download?key={{ key }}" download="{{ title }}.zip">DOWNLOAD</a>
+    -
+    {{ views }} views
+  </div>
+{% if selectors|length > 1 %}
+  <div class="selector">
+{% for idx in range(selectors|length) %}
+    <a href="/{{ key }}/{{ idx + 1 }}"><img src="{{ images[idx] }}"></a>
+{% endfor %}
+  </div>
+{% endif %}
+{% if selected_images|length > 2 %}
+{% for idx in range(selected_images|length) %}
+  <label for="comp-{{ idx + 1 }}"><span>{{ labels[idx] }}: {{ selected_images[idx].name }}</span></label><input type="radio" name="img" id="comp-{{ idx + 1 }}" {% if idx == 0 %} checked {% endif %}>
+{% endfor %}
+<br>
+{% endif %}
+{% if selected_images|length <= 2 %}
+<div class="comparisons">
+{% endif %}
+{% for idx in range(selected_images|length) %}
+  <div class="comparison comp-{{ idx + 1 }}">
+    <h2>{{ selected_images[idx].name }}</h2>
+    <img src="{{ selected_images[idx].url }}" />
+  </div>
+{% endfor %}
+{% if selected_images|length <= 2 %}
+</div>
+{% endif %}
+{% if selected_images|length > 2 %}
+  <script>
+    window.addEventListener('keydown', function (e) {
+      let key = e.keyCode
+      let p = -1
+      let selected = document.querySelector('input[name="img"]:checked').id.substr(5) * 1
+      if (key >= 49 && key <= 57) p = key - 48 // 1-9
+      if (key >= 97 && key <= 105) p = key - 96 // 1-9 (keypad)
+      if (key >= 65 && key <= 90) p = key - 55 // a-z (for 10+)
+      if (key === 37 || key === 38) p = selected - 1 // LEFT or UP
+      if (key === 39 || key === 40) p = selected + 1 // RIGHT or DOWN
+      let el = document.getElementById('comp-'+p)
+      if (el) {
+        el.checked = true
+        e.preventDefault()
+      }
+    })
+  </script>
+{% endif %}
+</body>
+</html>

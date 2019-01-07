@@ -1,0 +1,177 @@
+include:
+  - '*.py'
+  - '*.jinja2'
+  - requirements.txt
+  - build.sh
+kind: ArchiveUploadSpec
+name: diff-pics-backend
+
+---
+apiVersion: fission.io/v1
+kind: Package
+metadata:
+  creationTimestamp: null
+  name: diff-pics-backend
+  namespace: default
+spec:
+  buildcmd: ./build.sh
+  deployment:
+    checksum: {}
+  environment:
+    name: python
+    namespace: default
+  source:
+    checksum: {}
+    type: url
+    url: archive://diff-pics-backend
+status:
+  buildstatus: pending
+
+---
+apiVersion: fission.io/v1
+kind: Function
+metadata:
+  creationTimestamp: null
+  name: diff-pics-comparison
+  namespace: default
+spec:
+  InvokeStrategy:
+    ExecutionStrategy:
+      ExecutorType: poolmgr
+      MaxScale: 0
+      MinScale: 0
+      TargetCPUPercent: 0
+    StrategyType: execution
+  configmaps: null
+  environment:
+    name: python
+    namespace: default
+  package:
+    functionName: comparison.main
+    packageref:
+      name: diff-pics-backend
+      namespace: default
+  resources: {}
+  secrets:
+    - name: mysql-creds
+      namespace: default
+
+---
+apiVersion: fission.io/v1
+kind: Function
+metadata:
+  creationTimestamp: null
+  name: diff-pics-check-images
+  namespace: default
+spec:
+  InvokeStrategy:
+    ExecutionStrategy:
+      ExecutorType: poolmgr
+      MaxScale: 0
+      MinScale: 0
+      TargetCPUPercent: 0
+    StrategyType: execution
+  configmaps: null
+  environment:
+    name: python
+    namespace: default
+  package:
+    functionName: check_images.main
+    packageref:
+      name: diff-pics-backend
+      namespace: default
+  resources: {}
+  secrets:
+    - name: mysql-creds
+      namespace: default
+
+---
+apiVersion: fission.io/v1
+kind: Function
+metadata:
+  creationTimestamp: null
+  name: diff-pics-create-comparison
+  namespace: default
+spec:
+  InvokeStrategy:
+    ExecutionStrategy:
+      ExecutorType: poolmgr
+      MaxScale: 0
+      MinScale: 0
+      TargetCPUPercent: 0
+    StrategyType: execution
+  configmaps: null
+  environment:
+    name: python
+    namespace: default
+  package:
+    functionName: create_comparison.main
+    packageref:
+      name: diff-pics-backend
+      namespace: default
+  resources: {}
+  secrets:
+    - name: mysql-creds
+      namespace: default
+
+---
+apiVersion: fission.io/v1
+kind: Function
+metadata:
+  creationTimestamp: null
+  name: diff-pics-download
+  namespace: default
+spec:
+  InvokeStrategy:
+    ExecutionStrategy:
+      ExecutorType: poolmgr
+      MaxScale: 0
+      MinScale: 0
+      TargetCPUPercent: 0
+    StrategyType: execution
+  configmaps: null
+  environment:
+    name: python
+    namespace: default
+  package:
+    functionName: download.main
+    packageref:
+      name: diff-pics-backend
+      namespace: default
+  resources: {}
+  secrets:
+    - name: mysql-creds
+      namespace: default
+    - name: spaces-creds
+      namespace: default
+
+---
+apiVersion: fission.io/v1
+kind: Function
+metadata:
+  creationTimestamp: null
+  name: diff-pics-upload
+  namespace: default
+spec:
+  InvokeStrategy:
+    ExecutionStrategy:
+      ExecutorType: poolmgr
+      MaxScale: 0
+      MinScale: 0
+      TargetCPUPercent: 0
+    StrategyType: execution
+  configmaps: null
+  environment:
+    name: python
+    namespace: default
+  package:
+    functionName: upload.main
+    packageref:
+      name: diff-pics-backend
+      namespace: default
+  resources: {}
+  secrets:
+    - name: mysql-creds
+      namespace: default
+    - name: spaces-creds
+      namespace: default
