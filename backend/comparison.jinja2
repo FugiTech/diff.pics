@@ -102,7 +102,7 @@
 {% if selectors|length > 1 %}
   <div class="selector">
 {% for idx in range(selectors|length) %}
-    <a href="/{{ key }}/{{ idx + 1 }}"><img src="{{ images[idx] }}"></a>
+    <a href="/{{ key }}/{{ idx + 1 }}"><img src="{{ selectors[idx] }}"></a>
 {% endfor %}
   </div>
 {% endif %}

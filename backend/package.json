@@ -1,0 +1,6 @@
+{
+  "name": "diff-pics-backend",
+  "dependencies": {
+    "serverless-kubeless": "^0.4.0"
+  }
+}

@@ -1,33 +1,33 @@
-from flask import request, current_app
 from PIL import Image
 from io import BytesIO
-import hashlib, boto3, json
+import hashlib, boto3, json, bottle
 
 import db
 
 access_key = ""
 access_secret = ""
 
-with open("/secrets/default/spaces-creds/access_key", "r") as f:
+with open("/spaces-creds/access_key", "r") as f:
     access_key = f.read()
-with open("/secrets/default/spaces-creds/access_secret", "r") as f:
+with open("/spaces-creds/access_secret", "r") as f:
     access_secret = f.read()
 
 
-def main():
-    f = request.files.get("file")
-    imagedata = BytesIO()
+def handler(event, context):
+    f = event["extensions"]["request"].files.file.file
+    imagedata = BytesIO(f.read())
     thumbdata = BytesIO()
     fmt = None
-    with Image.open(f) as image:
-        if not image.format in ("bmp", "jpeg", "png"):
-            return json.dumps({"error": "invalid image format"}), 400
+
+    with Image.open(imagedata) as image:
+        fmt = image.format.lower().replace("e", "")
+        if not fmt in ("bmp", "jpg", "png"):
+            return bottle.HTTPResponse(
+                status=400, body=json.dumps({"error": "invalid image format: " + fmt})
+            )
         thumb = image.copy()
         thumb.thumbnail((300, 60), Image.LANCZOS)
-        thumb.format = image.format
-        image.save(imagedata)
-        thumb.save(thumbdata)
-        fmt = image.format.replace("e", "")
+        thumb.save(thumbdata, format=image.format)
 
     imagepath = hashlib.sha1(imagedata.getvalue()).hexdigest().upper()
     thumbpath = hashlib.sha1(thumbdata.getvalue()).hexdigest().upper()
@@ -41,11 +41,15 @@ def main():
         aws_access_key_id=access_key,
         aws_secret_access_key=access_secret,
     )
-    s3.Object("diff-pics", "images/" + imagepath).put(Body=imagedata, ACL="public-read")
-    s3.Object("diff-pics", "thumbs/" + thumbpath).put(Body=thumbdata, ACL="public-read")
+    s3.Object("diff-pics", "images/" + imagepath).put(
+        Body=imagedata.getvalue(), ACL="public-read", ContentType="image/" + fmt
+    )
+    s3.Object("diff-pics", "thumbs/" + thumbpath).put(
+        Body=thumbdata.getvalue(), ACL="public-read", ContentType="image/" + fmt
+    )
 
     db.session.add(db.Image(path=imagepath, thumb=thumbpath, format=fmt))
     db.session.commit()
 
-    return ""
+    return json.dumps({"image": imagepath, "thumb": thumbpath})
 

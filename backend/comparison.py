@@ -1,4 +1,3 @@
-from flask import request, current_app
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import os, string
 
@@ -12,9 +11,10 @@ env = Environment(
 )
 
 
-def main():
-    key = request.environ.get("HTTP_X_FISSION_PARAMS_KEY", "<invalid>")
-    idx = int(request.environ.get("HTTP_X_FISSION_PARAMS_INDEX", "1"))
+def handler(event, context):
+    p = event["extensions"]["request"].path.split("/")
+    key = p[1] if len(p) > 1 else "<invalid>"
+    idx = int(p[2]) if len(p) > 2 else 1
 
     selectors = []
     selected_images = []
@@ -26,6 +26,7 @@ def main():
         return "No comparison found for key: " + key
 
     comparison.views = db.Comparison.views + 1
+    db.session.commit()
 
     for ci in comparison.comparison_images:
         if ci.row == idx - 1:

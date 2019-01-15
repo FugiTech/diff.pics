@@ -2,3 +2,4 @@ sqlalchemy
 PyMySQL>=0.8.1,<0.9
 Pillow
 boto3
+jinja2

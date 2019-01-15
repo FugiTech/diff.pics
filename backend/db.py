@@ -6,9 +6,9 @@ from sqlalchemy import Column, Integer, String, ForeignKey
 username = ""
 password = ""
 
-with open("/secrets/default/mysql-creds/username", "r") as f:
+with open("/mysql-creds/username", "r") as f:
     username = f.read()
-with open("/secrets/default/mysql-creds/password", "r") as f:
+with open("/mysql-creds/password", "r") as f:
     password = f.read()
 
 engine = create_engine(

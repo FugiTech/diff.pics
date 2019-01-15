@@ -1,25 +1,26 @@
-from flask import request, current_app
 from io import BytesIO
-import boto3, zipfile
+import boto3, zipfile, json, bottle
 
 import db
 
 access_key = ""
 access_secret = ""
 
-with open("/secrets/default/spaces-creds/access_key", "r") as f:
+with open("/spaces-creds/access_key", "r") as f:
     access_key = f.read()
-with open("/secrets/default/spaces-creds/access_secret", "r") as f:
+with open("/spaces-creds/access_secret", "r") as f:
     access_secret = f.read()
 
 
-def main():
-    key = request.args.get("key")
+def handler(event, context):
+    key = event["extensions"]["request"].params.key
     comparison = (
         db.session.query(db.Comparison).filter(db.Comparison.key == key).first()
     )
     if comparison is None:
-        return "Invalid Comparison", 400
+        return bottle.HTTPResponse(
+            status=400, body=json.dumps({"error": "Invalid Comparison"})
+        )
 
     s3 = boto3.session.Session().resource(
         "s3",

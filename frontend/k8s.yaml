@@ -49,3 +49,23 @@ spec:
             backend:
               serviceName: diff-pics
               servicePort: web
+          - path: /check_images
+            backend:
+              serviceName: diff-pics-check-images
+              servicePort: 8080
+          - path: /create_comparison
+            backend:
+              serviceName: diff-pics-create-comparison
+              servicePort: 8080
+          - path: /download
+            backend:
+              serviceName: diff-pics-download
+              servicePort: 8080
+          - path: /upload
+            backend:
+              serviceName: diff-pics-upload
+              servicePort: 8080
+          - path: /{k:[-_0-9A-Za-z][-_0-9A-Za-z][-_0-9A-Za-z][-_0-9A-Za-z][-_0-9A-Za-z][-_0-9A-Za-z][-_0-9A-Za-z][-_0-9A-Za-z][-_0-9A-Za-z][-_0-9A-Za-z][-_0-9A-Za-z][-_0-9A-Za-z]+}
+            backend:
+              serviceName: diff-pics-comparison
+              servicePort: 8080
