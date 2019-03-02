@@ -2,6 +2,7 @@ FROM mhart/alpine-node:10 AS build
 
 WORKDIR /app
 COPY . .
+RUN rm -rf node_modules package-lock.json && npm install
 RUN yarn build
 
 
